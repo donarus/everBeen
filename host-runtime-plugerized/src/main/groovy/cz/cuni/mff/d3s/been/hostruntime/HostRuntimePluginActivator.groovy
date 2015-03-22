@@ -1,6 +1,5 @@
-package cz.cuni.mff.d3s.been.hostruntime.cz.cuni.mff.d3s.been.hostruntime
+package cz.cuni.mff.d3s.been.hostruntime
 
-import cz.cuni.mff.d3s.been.hostruntime.IHostRuntime
 import cz.cuni.mff.d3s.been.pluger.IPluginActivator
 import cz.cuni.mff.d3s.been.pluger.IServiceRegistrator
 
