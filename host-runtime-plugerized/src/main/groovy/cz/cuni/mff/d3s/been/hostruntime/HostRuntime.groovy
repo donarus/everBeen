@@ -1,8 +1,7 @@
-package cz.cuni.mff.d3s.been.hostruntime.cz.cuni.mff.d3s.been.hostruntime
+package cz.cuni.mff.d3s.been.hostruntime
 
 import cz.cuni.mff.d3s.been.databus.IDataBus
 import cz.cuni.mff.d3s.been.databus.UUIDType
-import cz.cuni.mff.d3s.been.hostruntime.IHostRuntime
 import cz.cuni.mff.d3s.been.pluger.InjectService
 import cz.cuni.mff.d3s.been.pluger.PlugerServiceConstants
 import org.slf4j.Logger
