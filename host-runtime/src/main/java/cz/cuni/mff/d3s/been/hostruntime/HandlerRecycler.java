@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.been.hostruntime;
+git statpackage cz.cuni.mff.d3s.been.hostruntime;
 
 import cz.cuni.mff.d3s.been.socketworks.twoway.ReadReplyHandler;
 

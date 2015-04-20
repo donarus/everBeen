@@ -29,19 +29,31 @@
             <artifactId>cglib-nodep</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cz.cuni.mff.d3s.been</groupId>
             <artifactId>databus-api-plugerized</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>cz.cuni.mff.d3s.been</groupId>
             <artifactId>host-runtime-api-plugerized</artifactId>
         </dependency>
         <dependency>
+            <groupId>cz.cuni.mff.d3s.been</groupId>
+            <artifactId>detectors-api-plugerized</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
             <artifactId>pluger-api</artifactId>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -54,18 +66,10 @@
                 <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
                 <artifactId>pluger-maven-plugin</artifactId>
                 <configuration>
-                    <activator>cz.cuni.mff.d3s.been.hostruntime.HostRuntimePluginActivator</activator>
+                    <activator>cz.cuni.mff.d3s.been.hostruntime.HostRuntime</activator>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>pluginate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
-
         </plugins>
     </build>
+
 </project>

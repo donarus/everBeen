@@ -12,157 +12,48 @@
     <packaging>pom</packaging>
 
     <properties>
-        <!-- 3RD PARTY DEPENDENCIES -->
-        <args4j.version>2.0.23</args4j.version>
-        <commons-compress.version>1.5</commons-compress.version>
-        <commons-exec.version>1.1</commons-exec.version>
-        <commons-io.version>2.4</commons-io.version>
-        <commons-jxpath.version>1.3</commons-jxpath.version>
-        <commons-lang3.version>3.1</commons-lang3.version>
-        <commons-collections.version>3.2.1</commons-collections.version>
-        <com.github.stefanbirkner_system-rules.version>1.3.0</com.github.stefanbirkner_system-rules.version>
-        <de.flapdoodle.embed.mongo.version>1.31</de.flapdoodle.embed.mongo.version>
-        <hazelcast.version>3.4.1</hazelcast.version>
-        <httpclient.version>4.2.3</httpclient.version>
-        <httpcore.version>4.2.3</httpcore.version>
-        <jackson-mapper-asl.version>1.9.12</jackson-mapper-asl.version>
-        <jaxb2-basics-runtime.version>0.6.4</jaxb2-basics-runtime.version>
-        <jeromq.version>0.2.0</jeromq.version>
-        <jline.version>2.10</jline.version>
-        <junit.version>4.11</junit.version>
-        <maven.version>3.0.5</maven.version>
-        <mongo.version>2.11.1</mongo.version>
-        <mockito.version>1.9.5</mockito.version>
-        <sigar.version>1.6.4</sigar.version>
-        <tapestry-cometd.version>0.9.17</tapestry-cometd.version>
-        <tapestry-conversations.version>0.1.2</tapestry-conversations.version>
-        <tapestry5-jquery.version>3.3.1</tapestry5-jquery.version>
-        <tapestry5.version>5.3.8</tapestry5.version>
-        <servlet-api.version>2.5</servlet-api.version>
-        <groovy-all.version>2.4.0</groovy-all.version>
-        <spock-core.version>0.7-groovy-2.0</spock-core.version>
-        <cglib-nodep.version>3.1</cglib-nodep.version>
-
-        <!-- PLUGIN VERSION CONTROL -->
-        <jetty-maven-plugin.version>8.1.7.v20120910</jetty-maven-plugin.version>
-        <jvnetbasics.version>0.6.4</jvnetbasics.version>
-        <jvnetfluent.version>3.0</jvnetfluent.version>
-        <jvnetjaxb.version>0.9.0</jvnetjaxb.version>
-        <maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
-        <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>2.7</maven-dependency-plugin.version>
-        <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
-        <maven-plugin-annotations.version>3.2</maven-plugin-annotations.version>
-        <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version>
-        <maven-site-plugin.version>3.2</maven-site-plugin.version>
-        <maven-javadoc-plugin.version>2.10.1</maven-javadoc-plugin.version>
-        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-        <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>
-        <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
-        <versions-maven-plugin.version>2.0</versions-maven-plugin.version>
-        <gmavenplus-plugin.version>1.3</gmavenplus-plugin.version>
-
-        <!-- PLUGER DEPENDENCIES -->
-        <pluger.version>1.0-SNAPSHOT</pluger.version>
-
-        <!-- SOURCE LEVEL CONTROL -->
+        <!-- SOURCE CONTROL -->
         <java-source.version>1.8</java-source.version>
         <java-target.version>1.8</java-target.version>
-
-        <!-- LOGGING -->
-        <logback.version>1.1.2</logback.version>
-        <slf4j.version>1.7.5</slf4j.version>
-
-        <!-- ENCODING -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- DEPENDENCIES VERSIONS -->
+        <cglib-nodep.version>3.1</cglib-nodep.version>
+        <commons-cli.version>1.2</commons-cli.version>
+        <groovy-all.version>2.4.3</groovy-all.version>
+        <hazelcast.version>3.4.2</hazelcast.version>
+        <logback.version>1.1.3</logback.version>
+        <junit.version>4.12</junit.version>
+        <pluger.version>1.0-SNAPSHOT</pluger.version>
+        <sigar.version>1.6.4</sigar.version>
+        <slf4j.version>1.7.12</slf4j.version>
+        <spock-core.version>1.0-groovy-2.4</spock-core.version>
+
+        <!-- PLUGIN VERSIONS -->
+        <gmavenplus-plugin.version>1.5</gmavenplus-plugin.version>
+        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+        <versions-maven-plugin.version>2.1</versions-maven-plugin.version>
+
+        <!-- PLUGER OUTPUT CONFIGURATION -->
+        <pluger.plugin.output.dir>${project.parent.basedir}/target/been/plugins</pluger.plugin.output.dir>
+        <commons-lang3.version>3.4</commons-lang3.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            <!-- BEEN DEPENDENCIES -->
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>core-data</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>util</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>core-cluster</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>task-manager</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>host-runtime</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>software-repository-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>service-logger-handler</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>object-repository</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>mongo-storage</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>mongodb-mapstore</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
+            <!-- BEEN SUBPROJECTS -->
             <dependency>
                 <groupId>cz.cuni.mff.d3s.been</groupId>
                 <artifactId>databus-api-plugerized</artifactId>
@@ -172,6 +63,18 @@
             <dependency>
                 <groupId>cz.cuni.mff.d3s.been</groupId>
                 <artifactId>databus-hazelcast-plugerized</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been</groupId>
+                <artifactId>detectors-api-plugerized</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been</groupId>
+                <artifactId>detectors-sigar-plugerized</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -187,19 +90,71 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- BEEN LOGGING -->
+            <!-- PLUGER -->
             <dependency>
-                <groupId>cz.cuni.mff.d3s.been</groupId>
-                <artifactId>logback-appender</artifactId>
-                <version>${project.version}</version>
+                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+                <artifactId>pluger-api</artifactId>
+                <version>${pluger.version}</version>
             </dependency>
 
-            <!-- EXTERNAL DEPENDENCIES -->
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
+                <artifactId>pluger-impl</artifactId>
+                <version>${pluger.version}</version>
+            </dependency>
+
+            <!-- GROOVY -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy-all.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib-nodep</artifactId>
+                <version>${cglib-nodep.version}</version>
+            </dependency>
+
+            <!-- TESTING -->
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${spock-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+
+            <!-- LOGGING -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+
+            <!-- OTHER DEPENDENCIES -->
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${commons-cli.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>com.hazelcast</groupId>
@@ -208,58 +163,55 @@
             </dependency>
 
             <dependency>
-                <groupId>args4j</groupId>
-                <artifactId>args4j</artifactId>
-                <version>${args4j.version}</version>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast-client</artifactId>
+                <version>${hazelcast.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
-                <artifactId>pluger-api</artifactId>
-                <version>${pluger.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>${groovy-all.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.spockframework</groupId>
-                <artifactId>spock-core</artifactId>
-                <version>${spock-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib-nodep</artifactId>
-                <version>${cglib-nodep.version}</version>
+                <groupId>org.fusesource</groupId>
+                <artifactId>sigar</artifactId>
+                <version>${sigar.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
         <pluginManagement>
+
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${versions-maven-plugin.version}</version>
+                </plugin>
+                <!-- MAVEN COMPILER -->
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${maven-resources-plugin.version}</version>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${java-source.version}</source>
+                        <target>${java-target.version}</target>
+                    </configuration>
                 </plugin>
 
+                <!-- PLUGER -->
                 <plugin>
                     <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
                     <artifactId>pluger-maven-plugin</artifactId>
                     <version>${pluger.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>pluginate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
 
+                <!-- GROOVY -->
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
@@ -307,139 +259,24 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>${java-source.version}</source>
-                    <target>${java-target.version}</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>${maven-site-plugin.version}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <show>package</show>
-                    <excludePackageNames>cz.cuni.mff.d3s.been.web:cz.cuni.mff.d3s.been.web.*</excludePackageNames>
-                    <!-- REMOVE ONCE DOCUMENTATION IS FIXED TO SUPPORT JAVA 8 -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>plugerized</id>
-            <modules>
-                <module>databus-api-plugerized</module>
-                <module>databus-hazelcast-plugerized</module>
-                <module>host-runtime-api-plugerized</module>
-                <module>host-runtime-plugerized</module>
-                <module>plugerized</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>old</id>
-            <modules>
-                <module>been-api</module>
-                <module>benchmark-api</module>
-                <module>bpk-conventions</module>
-                <module>checkpoints</module>
-                <module>client-submitter</module>
-                <module>client-shell</module>
-                <module>core-data</module>
-                <module>core-protocol</module>
-                <module>core-cluster</module>
-                <module>debug-assistant</module>
-                <module>detectors</module>
-                <module>host-runtime</module>
-                <module>logback-appender</module>
-                <module>mapstore</module>
-                <module>mongodb-mapstore</module>
-                <module>mongo-storage</module>
-                <module>mongo-storage-standalone</module>
-                <module>node</module>
-                <module>node-deploy</module>
-                <module>object-repository</module>
-                <module>persistence</module>
-                <module>results</module>
-                <module>service-logger</module>
-                <module>service-logger-handler</module>
-                <module>socketworks-clients</module>
-                <module>socketworks-servers</module>
-                <module>software-repository</module>
-                <module>software-repository-store</module>
-                <module>software-repository-client</module>
-                <module>software-repository-fsbasedstore</module>
-                <module>software-repository-server</module>
-                <module>storage</module>
-                <module>task-api</module>
-                <module>task-manager</module>
-                <module>util</module>
-                <module>web-interface</module>
-                <module>web-interface-standalone</module>
-                <module>xsd-export</module>
-                <module>xsd-catalog-resolver</module>
-            </modules>
-        </profile>
-    </profiles>
-
-    <distributionManagement>
-        <repository>
-            <id>everbeen.cz-release</id>
-            <name>EverBEEN release artifactory</name>
-            <url>http://everbeen.cz/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>everbeen.cz-snapshot</id>
-            <name>EverBEEN snapshot artifactory</name>
-            <url>http://everbeen.cz/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <modules>
+        <module>databus-api-plugerized</module>
+        <module>databus-hazelcast-plugerized</module>
+        <module>detectors-api-plugerized</module>
+        <module>detectors-sigar-plugerized</module>
+        <module>host-runtime-api-plugerized</module>
+        <module>host-runtime-plugerized</module>
+        <module>plugerized</module>
+    </modules>
 
     <repositories>
         <repository>

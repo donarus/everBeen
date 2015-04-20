@@ -33,6 +33,10 @@
             <artifactId>hazelcast</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cz.cuni.mff.d3s.been</groupId>
             <artifactId>databus-api-plugerized</artifactId>
         </dependency>
@@ -41,7 +45,6 @@
             <artifactId>pluger-api</artifactId>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -54,18 +57,10 @@
                 <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
                 <artifactId>pluger-maven-plugin</artifactId>
                 <configuration>
-                    <activator>cz.cuni.mff.d3s.been.databus.hazelcast.DataBusHazelcastPluginActivator</activator>
+                    <activator>cz.cuni.mff.d3s.been.databus.hazelcast.DataBusHazelcast</activator>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>pluginate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
-
         </plugins>
     </build>
+
 </project>
