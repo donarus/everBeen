@@ -11,4 +11,12 @@
         <version>3.1.0</version>
     </parent>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
 </project>
