@@ -37,6 +37,11 @@ class HostRuntime implements IHostRuntime, IPluginActivator {
     //
 
     @Override
+    void configure(Map<String, String> configuration) {
+
+    }
+
+    @Override
     void activate(IServiceRegistrator registry) {
         registry.registerService(IHostRuntime, this)
     }

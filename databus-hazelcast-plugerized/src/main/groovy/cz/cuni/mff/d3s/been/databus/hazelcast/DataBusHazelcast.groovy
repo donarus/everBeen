@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.been.databus.hazelcast
 
+import com.hazelcast.client.HazelcastClient
+import com.hazelcast.client.config.ClientConfig
 import com.hazelcast.config.Config
 import com.hazelcast.config.ListConfig
 import com.hazelcast.config.MapConfig
@@ -20,9 +22,21 @@ import cz.cuni.mff.d3s.been.pluger.PlugerServiceConstants
  */
 class DataBusHazelcast implements IDataBus, IPluginActivator {
 
+    private static final String CONFIG_KEY_PREFIX = "databus-hazelcast"
+
+    private static final String MEMBER_TYPE_KEY = "${CONFIG_KEY_PREFIX}.member-type"
+
+    private static final enum HazelcastMemberType {
+        NATIVE, FULL
+    }
+
     private static final String HC_LOGGING_TYPE_KEY = "hazelcast.logging.type"
 
     private static final String HC_LOGGING_TYPE = "slf4j"
+
+    private static final HazelcastMemberType DEFAULT_MEMBER_TYPE = HazelcastMemberType.FULL
+
+    private HazelcastMemberType memberType
 
     @InjectService(serviceName = PlugerServiceConstants.PLUGIN_CLASSLOADER)
     private ClassLoader pluginsClassLoader
@@ -30,11 +44,22 @@ class DataBusHazelcast implements IDataBus, IPluginActivator {
     private HazelcastInstance hazelcastInstance
 
     void connect() {
-        hazelcastInstance = Hazelcast.newHazelcastInstance(createHazelcastConfig())
+        if (memberType == HazelcastMemberType.FULL) {
+            hazelcastInstance = Hazelcast.newHazelcastInstance(createHazelcastInstanceConfig())
+        } else {
+            hazelcastInstance = HazelcastClient.newHazelcastClient(createHazelcastClientConfig())
+        }
     }
 
-    private Config createHazelcastConfig() {
+    private Config createHazelcastInstanceConfig() {
         def config = new Config()
+        config.setClassLoader(pluginsClassLoader)
+        config.setProperty(HC_LOGGING_TYPE_KEY, HC_LOGGING_TYPE)
+        return config
+    }
+
+    private ClientConfig createHazelcastClientConfig() {
+        def config = new ClientConfig()
         config.setClassLoader(pluginsClassLoader)
         config.setProperty(HC_LOGGING_TYPE_KEY, HC_LOGGING_TYPE)
         return config
@@ -204,6 +229,20 @@ class DataBusHazelcast implements IDataBus, IPluginActivator {
     //
     // PLUGIN ACTIVATOR METHODS
     //
+
+    @Override
+    void configure(Map<String, String> configuration) {
+        memberType = getMemberType(configuration, DEFAULT_MEMBER_TYPE)
+    }
+
+    private HazelcastMemberType getMemberType(Map<String, String> configuration, HazelcastMemberType defaultMemberType) {
+        def configuredMemberType = configuration.get(MEMBER_TYPE_KEY, defaultMemberType.name()).toUpperCase().trim()
+        if (HazelcastMemberType.values()*.name().contains(configuredMemberType)) {
+           return(HazelcastMemberType.valueOf(configuredMemberType))
+        } else {
+            return defaultMemberType
+        }
+    }
 
     @Override
     void activate(IServiceRegistrator registry) {

@@ -10,7 +10,7 @@ public class Bootstrap {
 
     private static final Logger LOG = LoggerFactory.getLogger(Bootstrap)
 
-    private String[] beenOpts
+    private Map<String, String> pluginsConfiguration
     private File workingDirectory
     private boolean clearLibDir
 
@@ -28,7 +28,7 @@ public class Bootstrap {
                     optionalArg: false,
                     'Set working directory - current WD by default.'
 
-            o longOpt: 'opts',
+            o longOpt: 'plugins-configuration',
                     args: Option.UNLIMITED_VALUES,
                     argName: 'option',
                     optionalArg: true,
@@ -48,27 +48,35 @@ public class Bootstrap {
         }
 
         def workingDirectory = (options.'workdir') ? new File(options.'workdir') : new File(".")
-        def beenOpts = (options.'optss') ? options.'optss' as String[] : [] as String[]
+        def pluginsConfiguration = parsePluginsConfiguration((options.'plugins-configurations') ? options.'plugins-configurations' as String[] : [] as String[])
         def cleanLibDir = (options.'clean') ? true : false
 
-        def bootstrap = new Bootstrap(beenOpts, workingDirectory, cleanLibDir)
+        def bootstrap = new Bootstrap(pluginsConfiguration, workingDirectory, cleanLibDir)
         bootstrap.bootstrap()
     }
 
-    public Bootstrap(String[] beenOpts, File workingDirectory, boolean clearLibDir) {
+    static Map<String, String> parsePluginsConfiguration(String[] strings) {
+        def config = [:]
+        strings.each {
+            def splitted = it.split("=", 2)
+            config.put(splitted[0], splitted.length > 1 ? splitted[1] : "true")
+        }
+        return (config)
+    }
+
+    public Bootstrap(Map<String, String> pluginsConfiguration, File workingDirectory, boolean clearLibDir) {
         this.clearLibDir = clearLibDir
         this.workingDirectory = workingDirectory
-        this.beenOpts = beenOpts
+        this.pluginsConfiguration = pluginsConfiguration
     }
 
     public void bootstrap() {
         def config = [
-                (Pluger.PLUGER_STARTUP_ARGS)  : beenOpts,
                 (Pluger.WORKING_DIRECTORY_KEY): workingDirectory.toPath(),
                 (Pluger.CLEAR_LIB_DIR_KEY)    : clearLibDir
         ]
         try {
-            def pluger = Pluger.create(config)
+            def pluger = Pluger.create(config, pluginsConfiguration)
             pluger.start()
         } catch (PlugerException e) {
             LOG.error("Pluger framework can't be initialized", e)
