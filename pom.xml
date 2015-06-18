@@ -90,6 +90,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been</groupId>
+                <artifactId>software-repository-api-plugerized</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cz.cuni.mff.d3s.been</groupId>
+                <artifactId>software-repository-http-plugerized</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- PLUGER -->
             <dependency>
                 <groupId>cz.cuni.mff.d3s.been.pluger</groupId>
@@ -276,6 +288,8 @@
         <module>host-runtime-api-plugerized</module>
         <module>host-runtime-plugerized</module>
         <module>plugerized</module>
+        <module>software-repository-api-plugerized</module>
+        <module>software-repository-http-plugerized</module>
     </modules>
 
     <repositories>

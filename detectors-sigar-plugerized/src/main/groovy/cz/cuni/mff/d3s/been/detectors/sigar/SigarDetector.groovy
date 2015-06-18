@@ -235,6 +235,11 @@ public class SigarDetector implements Detector, IPluginActivator {
     }
 
     @Override
+    void configure(Map<String, String> configuration) {
+
+    }
+
+    @Override
     void activate(IServiceRegistrator registry) {
         registry.registerService(Detector, this)
     }
