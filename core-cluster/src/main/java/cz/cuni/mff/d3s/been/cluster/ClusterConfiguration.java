@@ -112,7 +112,7 @@ public class ClusterConfiguration implements BeenServiceConfiguration {
 	/**
 	 * By default, these members will be contacted: {@code DEFAULT_TCP_MEMBERS}
 	 */
-	public static final String DEFAULT_TCP_MEMBERS = "localhost:5701";
+	public static final String DEFAULT_TCP_MEMBERS = "localhost";
 
 	/**
 	 * Property saying whether logging should be enabled for underlying Hazelcast

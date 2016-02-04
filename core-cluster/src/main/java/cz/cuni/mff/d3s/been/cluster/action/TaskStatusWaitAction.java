@@ -8,6 +8,7 @@ import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
 import com.hazelcast.core.IMap;
 
+import com.hazelcast.core.MapEvent;
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
 import cz.cuni.mff.d3s.been.socketworks.twoway.Replies;
@@ -93,6 +94,16 @@ final class TaskStatusWaitAction implements Action {
 			Reply reply = Replies.createErrorReply(msg);
 			queue.add(reply);
 		}
+
+		@Override
+		public void mapCleared(MapEvent event) {
+
+		}
+
+		@Override
+		public void mapEvicted(MapEvent event) {
+
+		}
 	}
 
 	@Override
@@ -109,7 +120,7 @@ final class TaskStatusWaitAction implements Action {
 
 		IMap<String, TaskEntry> map = ctx.getTasks().getTasksMap();
 
-		map.addEntryListener(waiter, taskId, true);
+		String listenerId = map.addEntryListener(waiter, taskId, true);
 
 		TaskEntry value = map.get(taskId);
 
@@ -126,7 +137,7 @@ final class TaskStatusWaitAction implements Action {
 			reply = Replies.createErrorReply("TIMEOUT");
 		}
 
-		map.removeEntryListener(waiter);
+		map.removeEntryListener(listenerId);
 		queue.clear();
 
 		return reply;

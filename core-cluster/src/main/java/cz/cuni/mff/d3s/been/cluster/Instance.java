@@ -6,10 +6,12 @@ import static cz.cuni.mff.d3s.been.cluster.ClusterConfiguration.PASSWORD;
 
 import java.util.Properties;
 
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.config.ClientNetworkConfig;
+import com.hazelcast.config.GroupConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.client.ClientConfig;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
@@ -171,7 +173,7 @@ public final class Instance {
 
 	/**
 	 * Creates native HazelcastInstance.
-	 * 
+	 *
 	 * @param userProperties
 	 *          properties to be used while connecting
 	 * @return connected native Hazelcast instance
@@ -179,11 +181,13 @@ public final class Instance {
 	 *           when connection cannot be established.
 	 */
 	private static HazelcastInstance createNativeInstance(Properties userProperties) throws ServiceException {
-
-		ClientConfig clientConfig = InstanceConfigHelper.createClientConfig(userProperties);
-
-		return HazelcastClient.newHazelcastClient(clientConfig);
-
+		ClientConfig cfg = new ClientConfig();
+		cfg.setGroupConfig(
+				new GroupConfig()
+						.setName(userProperties.getProperty(GROUP))
+						.setPassword(userProperties.getProperty(PASSWORD))
+		).setNetworkConfig(new ClientNetworkConfig().addAddress(userProperties.getProperty(MEMBERS)));
+		return  HazelcastClient.newHazelcastClient(cfg);
 	}
 
 	/**
@@ -217,8 +221,6 @@ public final class Instance {
 		switch (type) {
 			case DATA:
 				return createDataInstance(userProperties);
-			case LITE:
-				throw new UnsupportedOperationException("LITE node not implemented!");
 			case NATIVE:
 				return createNativeInstance(userProperties);
 			default:
@@ -233,9 +235,6 @@ public final class Instance {
 	 */
 	private static boolean isConnected() {
 		if (hazelcastInstance != null) {
-			if (hazelcastInstance instanceof HazelcastClient) {
-				return ((HazelcastClient) hazelcastInstance).isActive();
-			}
 			return true;
 		}
 		return false;

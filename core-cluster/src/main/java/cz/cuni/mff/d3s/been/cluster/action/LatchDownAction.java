@@ -1,9 +1,6 @@
 package cz.cuni.mff.d3s.been.cluster.action;
 
-import static com.hazelcast.core.Instance.InstanceType.COUNT_DOWN_LATCH;
-
 import com.hazelcast.core.ICountDownLatch;
-
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.socketworks.twoway.Replies;
 import cz.cuni.mff.d3s.been.socketworks.twoway.Reply;
@@ -39,14 +36,14 @@ final class LatchDownAction implements Action {
 	@Override
 	public Reply handle() {
 		String latchName = Actions.latchNameForRequest(request);
-		if (!ctx.containsInstance(COUNT_DOWN_LATCH, latchName)) {
+		if (!ctx.containsCountDownLatch(latchName)) {
 			return Replies.createErrorReply("No such Count Down Latch '%s'", latchName);
 		}
 
 		final ICountDownLatch countDownLatch = ctx.getCountDownLatch(latchName);
 		countDownLatch.countDown();
 
-		return Replies.createOkReply(Boolean.toString(countDownLatch.hasCount()));
+		return Replies.createOkReply(Boolean.toString(countDownLatch.getCount() > 0));
 	}
 
 }

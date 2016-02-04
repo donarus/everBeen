@@ -47,7 +47,7 @@ final class LatchSetAction implements Action {
 		}
 
 		final ICountDownLatch countDownLatch = ctx.getCountDownLatch(latchName);
-		boolean isCountSet = countDownLatch.setCount(count);
+		boolean isCountSet = countDownLatch.trySetCount(count);
 
 		if (isCountSet) {
 			return Replies.createOkReply(Boolean.TRUE.toString());

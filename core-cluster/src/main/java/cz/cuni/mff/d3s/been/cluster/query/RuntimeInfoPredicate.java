@@ -1,14 +1,13 @@
 package cz.cuni.mff.d3s.been.cluster.query;
 
-import java.util.List;
-
+import com.hazelcast.query.Predicate;
+import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
 import org.apache.commons.jxpath.JXPathContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.core.MapEntry;
-import com.hazelcast.query.Predicate;
-import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Selects Host Runtimes based on an XPath expression.
@@ -34,7 +33,7 @@ public class RuntimeInfoPredicate implements Predicate<String, RuntimeInfo> {
 	}
 
 	@Override
-	public boolean apply(MapEntry<String, RuntimeInfo> mapEntry) {
+	public boolean apply(Map.Entry<String, RuntimeInfo> mapEntry) {
 		RuntimeInfo info = mapEntry.getValue();
 
 		JXPathContext context = JXPathContext.newContext(info);

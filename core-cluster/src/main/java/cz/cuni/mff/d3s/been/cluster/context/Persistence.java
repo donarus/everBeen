@@ -6,10 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.hazelcast.core.EntryEvent;
-import com.hazelcast.core.EntryListener;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.IQueue;
+import com.hazelcast.core.*;
 
 import cz.cuni.mff.d3s.been.cluster.Names;
 import cz.cuni.mff.d3s.been.core.persistence.Entity;
@@ -83,7 +80,7 @@ public class Persistence {
 	public final QueryAnswer query(Query query) throws DAOException {
 		final BlockingQueue<String> answerReadyNotifier = new LinkedBlockingQueue<>();
 		final MapEntryReadyHook hook = new MapEntryReadyHook(answerReadyNotifier);
-		queryAnswerMap.addEntryListener(hook, query.getId(), false);
+		String entryListener = queryAnswerMap.addEntryListener(hook, query.getId(), false);
 		try {
 			queryQueue.add(query);
 			if (answerReadyNotifier.poll(queryTimeout, TimeUnit.SECONDS) == null) {
@@ -101,7 +98,7 @@ public class Persistence {
 		} catch (InterruptedException e) {
 			throw new DAOException(String.format("Interrupted when waiting for query result. Query was %s", query.toString()));
 		} finally {
-			queryAnswerMap.removeEntryListener(hook);
+			queryAnswerMap.removeEntryListener(entryListener);
 		}
 	}
 
@@ -160,6 +157,16 @@ public class Persistence {
 
 		@Override
 		public void entryRemoved(EntryEvent<String, QueryAnswer> event) {}
+
+		@Override
+		public void mapCleared(MapEvent event) {
+
+		}
+
+		@Override
+		public void mapEvicted(MapEvent event) {
+
+		}
 	}
 
 }

@@ -1,20 +1,18 @@
 package cz.cuni.mff.d3s.been.cluster.context;
 
-import static cz.cuni.mff.d3s.been.cluster.Names.BENCHMARKS_CONTEXT_ID;
-
-import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.hazelcast.core.ICountDownLatch;
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.Instance;
-
 import cz.cuni.mff.d3s.been.cluster.Names;
 import cz.cuni.mff.d3s.been.core.persistence.TaskEntity;
 import cz.cuni.mff.d3s.been.core.task.*;
 import cz.cuni.mff.d3s.been.persistence.DAOException;
 import cz.cuni.mff.d3s.been.persistence.task.PersistentDescriptors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+
+import static cz.cuni.mff.d3s.been.cluster.Names.BENCHMARKS_CONTEXT_ID;
 
 /**
  * Utility class for operations related to task contexts.
@@ -392,9 +390,9 @@ public class TaskContexts {
 		clusterContext.getMap("checkpointmap_" + taskContextEntry.getId()).destroy();
 
 		// destroy latches
-		Collection<Instance> latches = clusterContext.getInstances(Instance.InstanceType.COUNT_DOWN_LATCH);
-		for (Instance instance : latches) {
-			String latchName = instance.getId().toString();
+		Collection<ICountDownLatch> latches = clusterContext.getCountDownLatchInstances();
+		for (ICountDownLatch instance : latches) {
+			String latchName = instance.getName();
 			if (latchName.startsWith("d:latch_" + taskContextEntry.getId() + "_")) {
 				instance.destroy();
 			}

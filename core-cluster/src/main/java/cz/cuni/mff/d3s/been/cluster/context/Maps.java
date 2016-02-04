@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.Instance;
 
 /**
  * Utility class for often-used map related functions.
@@ -42,7 +41,7 @@ public class Maps {
 	public Collection<Object> getValues(String mapName) throws IllegalArgumentException {
 		Collection<Object> values = new LinkedList<>();
 
-		if (clusterCtx.containsInstance(Instance.InstanceType.MAP, mapName)) {
+		if (clusterCtx.containsMap(mapName)) {
 			IMap<?, ?> hrMap = clusterCtx.getInstance().getMap(mapName);
 
 			for (Object key : hrMap.keySet()) {

@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.core.MapEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,12 @@ final class MapWaitAction implements Action {
 
 		@Override
 		public void entryEvicted(EntryEvent<String, String> event) {}
+
+		@Override
+		public void mapCleared(MapEvent event) {}
+
+		@Override
+		public void mapEvicted(MapEvent event) {}
 	}
 
 	@Override
@@ -88,7 +95,7 @@ final class MapWaitAction implements Action {
 
 		IMap<String, String> iMap = ctx.getMap(map);
 
-		iMap.addEntryListener(waiter, key, true);
+		String listenerID = iMap.addEntryListener(waiter, key, true);
 
 		String value = iMap.get(key);
 
@@ -120,7 +127,7 @@ final class MapWaitAction implements Action {
 			reply = Replies.createOkReply(value);
 		}
 
-		iMap.removeEntryListener(waiter);
+		iMap.removeEntryListener(listenerID);
 		queue.clear();
 
 		return reply;

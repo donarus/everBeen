@@ -1,27 +1,19 @@
 package cz.cuni.mff.d3s.been.cluster;
 
-import static cz.cuni.mff.d3s.been.cluster.ClusterClientConfiguration.*;
+import com.hazelcast.config.*;
+import cz.cuni.mff.d3s.been.util.PropertyReader;
+
+import java.net.URL;
+import java.util.Properties;
+
 import static cz.cuni.mff.d3s.been.cluster.ClusterConfiguration.*;
 import static cz.cuni.mff.d3s.been.cluster.ClusterConfiguration.LOGGING_TYPE.NONE;
 import static cz.cuni.mff.d3s.been.cluster.ClusterConfiguration.LOGGING_TYPE.SLF4J;
 import static cz.cuni.mff.d3s.been.mapstore.MapStoreConfiguration.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.net.InetSocketAddress;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import com.hazelcast.client.AddressHelper;
-import com.hazelcast.client.ClientConfig;
-import com.hazelcast.config.*;
-import com.hazelcast.nio.Address;
-import cz.cuni.mff.d3s.been.util.PropertyReader;
 
 /**
  * Utility class for creating Hazelcast configurations.
- * 
+ *
  * @author Martin Sixta
  * @author Radek Macha
  */
@@ -44,7 +36,7 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Properties which are used to create configs.
-	 * 
+	 *
 	 * The resulting properties are created by merging default and user
 	 * properties.
 	 */
@@ -52,31 +44,18 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Creates the helper class.
-	 * 
+	 *
 	 * @param userProperties
 	 *          user properties
-	 * 
+	 *
 	 */
 	private InstanceConfigHelper(final Properties userProperties) {
 		this.propReader = PropertyReader.on(userProperties);
 	}
 
 	/**
-	 * Creates configuration for a Hazelcast client
-	 * 
-	 * @param userProperties
-	 *          BEEN's user-defined properties
-	 * @return Hazelcast client configuration
-	 * @throws ServiceException
-	 *           if configuration cannot be created
-	 */
-	static ClientConfig createClientConfig(final Properties userProperties) throws ServiceException {
-		return new InstanceConfigHelper(userProperties).createClientConfig();
-	}
-
-	/**
 	 * Creates configuration for a Hazelcast cluster member
-	 * 
+	 *
 	 * @param userProperties
 	 *          BEEN's user-defined properties
 	 * @return Hazelcast member configuration
@@ -88,31 +67,9 @@ final class InstanceConfigHelper {
 	}
 
 	/**
-	 * The actual function which creates ClientConfig.
-	 * 
-	 * @return {ClientConfig
-	 * @throws ServiceException
-	 *           if configuration cannot be created
-	 */
-	ClientConfig createClientConfig() throws ServiceException {
-
-		final int timeout = (int) SECONDS.toMillis(propReader.getInteger(TIMEOUT, DEFAULT_TIMEOUT));
-		final List<InetSocketAddress> socketAddresses = getPeers(propReader.getString(MEMBERS, DEFAULT_MEMBERS));
-
-		final GroupConfig groupConfig = createGroupConfig();
-		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.setConnectionTimeout(timeout).setGroupConfig(groupConfig).addInetSocketAddress(socketAddresses);
-
-		// There is no way to set property on the ClientConfig as far as I know (v2.5)
-		System.setProperty(PROPERTY_HAZELCAST_LOGGING_TYPE, getLoggingMode());
-
-		return clientConfig;
-	}
-
-	/**
-	 * 
+	 *
 	 * The actual function which creates Config.
-	 * 
+	 *
 	 * @return Hazelcast member configuration
 	 * @throws ServiceException
 	 *           if configuration cannot be created
@@ -142,7 +99,7 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Sets Maps properties
-	 * 
+	 *
 	 * @param config
 	 *          Hazelcast config
 	 */
@@ -156,7 +113,7 @@ final class InstanceConfigHelper {
 		final int backupCount = propReader.getInteger(BACKUP_COUNT, DEFAULT_BACKUP_COUNT);
 
 		// do not locally cache to avoid synchronization hell
-		tasksMap.setCacheValue(false).setBackupCount(backupCount);
+		tasksMap.setNearCacheConfig(new NearCacheConfig().setCacheLocalEntries(false)).setBackupCount(backupCount);
 
 		contextsMap.setBackupCount(backupCount);
 
@@ -203,16 +160,16 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Overrides the default configuration with user-defined values.
-	 * 
+	 *
 	 * @param mainConfig
 	 *          Config to override
 	 * @throws ServiceException
 	 */
 	private void overrideConfiguration(final Config mainConfig) throws ServiceException {
 		final int port = propReader.getInteger(PORT, DEFAULT_PORT);
-		final Interfaces interfaces = createInterfaces(propReader.getString(INTERFACES, DEFAULT_INTERFACES));
+		final InterfacesConfig interfaces = createInterfaces(propReader.getString(INTERFACES, DEFAULT_INTERFACES));
 		final GroupConfig groupConfig = createGroupConfig();
-		final Join joinConfig = createJoinConfig();
+		final JoinConfig joinConfig = createJoinConfig();
 
 		final NetworkConfig networkConfig = new NetworkConfig();
 
@@ -227,18 +184,18 @@ final class InstanceConfigHelper {
 	}
 
 	/**
-	 * Creates Hazelcast {@link Join} from configuration.
-	 * 
-	 * The {@link Join} class determines how cluster members will get to know
+	 * Creates Hazelcast {@link JoinConfig} from configuration.
+	 *
+	 * The {@link JoinConfig} class determines how cluster members will get to know
 	 * about each other.
-	 * 
-	 * @return Hazelcast {@link Join} configuration.
-	 * 
+	 *
+	 * @return Hazelcast {@link JoinConfig} configuration.
+	 *
 	 * @throws ServiceException
 	 *           when config cannot be created
 	 */
-	private Join createJoinConfig() throws ServiceException {
-		final Join join = new Join();
+	private JoinConfig createJoinConfig() throws ServiceException {
+		final JoinConfig join = new JoinConfig();
 
 		switch (getJoinType()) {
 			case MULTICAST:
@@ -259,9 +216,9 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Creates Hazelcast {@link GroupConfig} from configuration.
-	 * 
+	 *
 	 * This determines properties of the group of members.
-	 * 
+	 *
 	 * @return {@link GroupConfig} for the Hazelcast member
 	 */
 	private GroupConfig createGroupConfig() {
@@ -272,9 +229,9 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Creates Hazelcast {@link MulticastConfig} from configuration.
-	 * 
+	 *
 	 * @return {@link MulticastConfig} for the Hazelcast member
-	 * 
+	 *
 	 * @throws ServiceException
 	 *           when the config cannot be created due to config file errors
 	 */
@@ -289,9 +246,9 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Creates Hazelcast {@link TcpIpConfig} from configuration.
-	 * 
+	 *
 	 * @return {@link TcpIpConfig} for the Hazelcast member
-	 * 
+	 *
 	 * @throws ServiceException
 	 *           when the config cannot be created due to config file errors
 	 */
@@ -299,8 +256,8 @@ final class InstanceConfigHelper {
 		TcpIpConfig tcpIpConfig = new TcpIpConfig();
 		tcpIpConfig.setEnabled(true);
 
-		for (InetSocketAddress inetSocketAddress : getPeers(propReader.getString(TCP_MEMBERS, DEFAULT_TCP_MEMBERS))) {
-			tcpIpConfig.addAddress(new Address(inetSocketAddress));
+		for (String address : propReader.getString(TCP_MEMBERS, DEFAULT_TCP_MEMBERS).split(VALUE_SEPARATOR)) {
+			tcpIpConfig.addMember(address);
 		}
 
 		return tcpIpConfig;
@@ -308,14 +265,14 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Creates configuration of Hazelcast's interfaces.
-	 * 
+	 *
 	 * @param interfaceList
 	 *          list of interfaces separated by
 	 *          {@link InstanceConfigHelper#VALUE_SEPARATOR}
 	 * @return Interface configuration of Hazelcast
 	 */
-	private Interfaces createInterfaces(final String interfaceList) {
-		Interfaces interfaces = new Interfaces();
+	private InterfacesConfig createInterfaces(final String interfaceList) {
+		InterfacesConfig interfaces = new InterfacesConfig();
 
 		if (interfaceList == null || interfaceList.isEmpty()) {
 			interfaces.setEnabled(false);
@@ -331,26 +288,8 @@ final class InstanceConfigHelper {
 	}
 
 	/**
-	 * Returns list of {@link InetSocketAddress} from a String.
-	 * 
-	 * @param peersList
-	 *          List of peers separated by
-	 *          {@link InstanceConfigHelper#VALUE_SEPARATOR}
-	 * @return List of peers from the {@code peersList}
-	 */
-	private List<InetSocketAddress> getPeers(final String peersList) {
-		List<InetSocketAddress> peers = new LinkedList<>();
-		for (String address : peersList.split(VALUE_SEPARATOR)) {
-			peers.addAll(AddressHelper.getSocketAddresses(address));
-		}
-
-		return peers;
-
-	}
-
-	/**
 	 * Figures out what is the logging type for the instance.
-	 * 
+	 *
 	 * @return String representing logging type usable in setProperty calls on a
 	 *         Hazelcast instance
 	 */
@@ -361,7 +300,7 @@ final class InstanceConfigHelper {
 
 	/**
 	 * Determines from the configuration how cluster members will join
-	 * 
+	 *
 	 * @return the join type
 	 * @throws ServiceException
 	 *           if unknown join type is specified

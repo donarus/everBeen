@@ -15,6 +15,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;
 
+import com.hazelcast.transaction.impl.Transaction;
 import cz.cuni.mff.d3s.been.cluster.NodeType;
 import cz.cuni.mff.d3s.been.core.service.ServiceInfo;
 
@@ -83,11 +84,8 @@ public class ClusterContext {
 		this.benchmarks = new Benchmarks(this);
 		this.persistence = new Persistence(this);
 
-		if (hcInstance instanceof HazelcastClient) {
-			this.usesHazelcastClient = true;
-		} else {
-			usesHazelcastClient = false;
-		}
+
+		this.usesHazelcastClient = false;
 	}
 
 	/**
@@ -294,100 +292,39 @@ public class ClusterContext {
 	}
 
 	/**
-	 * Returns a Hazelcast multimap with the specified name. If such a multimap
-	 * does not exist, it will be created.
-	 * 
-	 * @param name
-	 *          name of the multimap
-	 * @param <K>
-	 *          type of the multimap keys
-	 * @param <V>
-	 *          type of the multimap values
-	 * @return the multimap with the specified name
-	 */
-	public <K, V> MultiMap<K, V> getMultiMap(String name) {
-		return getInstance().getMultiMap(name);
-	}
-
-	/**
-	 * Returns a Hazelcast list with the specified name. If such a list does not
-	 * exist, it will be created.
-	 * 
-	 * @param name
-	 *          name of the list
-	 * @param <E>
-	 *          type of the list items
-	 * @return the list with the specified name
-	 */
-	public <E> IList<E> getList(String name) {
-		return getInstance().getList(name);
-	}
-
-	/**
-	 * Returns the Hazelcast transaction object for the current thread.
-	 * 
-	 * @return the transaction object
-	 */
-	public Transaction getTransaction() {
-		return getInstance().getTransaction();
-	}
-
-	/**
-	 * Returns a Hazelcast atomic number with the specified name. If such an
-	 * atomic number does not exist, it will be created.
-	 * 
-	 * @param name
-	 *          the name of the atomic number
-	 * @return the atomic number with the specified name
-	 */
-	public AtomicNumber getAtomicNumber(String name) {
-		return getInstance().getAtomicNumber(name);
-	}
-
-	/**
 	 * Returns all queue, map, set, list, topic, lock, multimap instances created
 	 * by Hazelcast.
 	 * 
 	 * @return the collection of instances created by Hazelcast.
 	 */
-	public Collection<Instance> getInstances() {
-		return getInstance().getInstances();
+	public Collection<DistributedObject> getInstances() {
+		return getInstance().getDistributedObjects();
 	}
 
-	/**
-	 * Returns instances of specified type created by Hazelcast.
-	 * 
-	 * @param instanceType
-	 *          the type of the instances to list
-	 * @return the collection of instances of specified type created by Hazelcast.
-	 */
-	public Collection<Instance> getInstances(Instance.InstanceType instanceType) {
-		Collection<Instance> instances = new ArrayList<>();
-
-		for (Instance instance : getInstances()) {
-			if (instance.getInstanceType() == instanceType) {
-				instances.add(instance);
+	public Collection<ICountDownLatch> getCountDownLatchInstances() {
+		Collection<ICountDownLatch> instances = new ArrayList<>();
+		for(DistributedObject instance : getInstances()) {
+			if (instance instanceof ICountDownLatch) {
+				instances.add((ICountDownLatch) instance);
 			}
 		}
 
 		return instances;
 	}
 
-	/**
-	 * Checks for existence of an instance (queue, map, set, list, topic, lock,
-	 * multimap).
-	 * 
-	 * @param instanceType
-	 *          type of the instance
-	 * @param name
-	 *          name of the instance
-	 * @return true if the instance exists, false otherwise
-	 */
-	public boolean containsInstance(Instance.InstanceType instanceType, String name) {
+	public boolean containsMap(String name) {
+		for(DistributedObject instance : getInstances()) {
+			if (instance.getName() == name && instance instanceof IMap) {
+				return true;
+			}
+		}
 
-		for (Instance instance : getInstances(instanceType)) {
-			boolean isName = instance.getId().toString().endsWith(":" + name);
-			if (isName) {
+		return false;
+	}
+
+	public boolean containsCountDownLatch(String name) {
+		for(DistributedObject instance : getInstances()) {
+			if (instance.getName() == name && instance instanceof ICountDownLatch) {
 				return true;
 			}
 		}
@@ -447,12 +384,6 @@ public class ClusterContext {
 	 * @return true if the connection is active, false otherwise
 	 */
 	public boolean isActive() {
-		if (usesHazelcastClient) {
-			return ((HazelcastClient) hcInstance).isActive();
-		}
-
-		// Otherwise hcInstance is member of cluster, so
-		// ClusterCTX is connected to cluster by default
 		return true;
 	}
 

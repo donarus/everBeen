@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-2.5.xsd"
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.6.xsd"
 		   xmlns="http://www.hazelcast.com/schema/config"
 		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<group>
@@ -50,24 +50,10 @@
 	</network>
 	<partition-group enabled="false"/>
 	<executor-service>
-		<core-pool-size>16</core-pool-size>
-		<max-pool-size>64</max-pool-size>
-		<keep-alive-seconds>60</keep-alive-seconds>
+		<pool-size>16</pool-size>
+		<queue-capacity>64</queue-capacity>
 	</executor-service>
 	<queue name="default">
-		<!--
-			Maximum size of the queue. When a JVM's local queue size reaches the maximum,
-			all put/offer operations will get blocked until the queue size
-			of the JVM goes down below the maximum.
-			Any integer between 0 and Integer.MAX_VALUE. 0 means
-			Integer.MAX_VALUE. Default is 0.
-		-->
-		<max-size-per-jvm>0</max-size-per-jvm>
-		<!--
-			Name of the map configuration that will be used for the backing distributed
-			map for this queue.
-		-->
-		<backing-map-ref>default</backing-map-ref>
 	</queue>
 	<map name="default">
 		<!--
@@ -108,7 +94,7 @@
 			Any integer between 0 and Integer.MAX_VALUE. 0 means
 			Integer.MAX_VALUE. Default is 0.
 		-->
-		<max-size policy="cluster_wide_map_size">0</max-size>
+		<max-size>0</max-size>
 		<!--
 			When max. size is reached, specified percentage of
 			the map will be evicted. Any integer between 0 and 100.

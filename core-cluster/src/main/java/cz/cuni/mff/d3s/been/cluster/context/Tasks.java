@@ -160,7 +160,7 @@ public class Tasks {
 	 * @return Tasks map configuration
 	 */
 	public MapConfig getTasksMapConfig() {
-		return clusterCtx.getConfig().findMatchingMapConfig(Names.TASKS_MAP_NAME);
+		return clusterCtx.getConfig().findMapConfig(Names.TASKS_MAP_NAME);
 	}
 
 	/**

@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.core.MapEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +79,16 @@ public class ContextWaitAction implements Action {
 		public void entryEvicted(EntryEvent<String, TaskContextEntry> event) {
 			queue.add(event.getValue());
 		}
+
+		@Override
+		public void mapCleared(MapEvent event) {
+
+		}
+
+		@Override
+		public void mapEvicted(MapEvent event) {
+
+		}
 	}
 
 	@Override
@@ -90,7 +101,7 @@ public class ContextWaitAction implements Action {
 
 		IMap<String, TaskContextEntry> iMap = ctx.getTaskContexts().getTaskContextsMap();
 
-		iMap.addEntryListener(waiter, key, true);
+		String listenerId = iMap.addEntryListener(waiter, key, true);
 
 		TaskContextEntry value = iMap.get(key);
 
@@ -123,7 +134,7 @@ public class ContextWaitAction implements Action {
 			reply = Replies.createOkReply(value.getContextState().toString());
 		}
 
-		iMap.removeEntryListener(waiter);
+		iMap.removeEntryListener(listenerId);
 		queue.clear();
 
 		return reply;

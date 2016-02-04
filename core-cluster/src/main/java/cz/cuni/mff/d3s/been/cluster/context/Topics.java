@@ -68,34 +68,4 @@ public class Topics {
 		publish(Names.BEEN_GLOBAL_TOPIC, message);
 	}
 
-	/**
-	 * Adds a topic listener to the topic with the specified name.
-	 * 
-	 * @param name
-	 *          the name of the topic
-	 * @param listener
-	 *          the listener to add
-	 * @param <E>
-	 *          the type of the topic items
-	 */
-	public <E> void addListener(String name, MessageListener<E> listener) {
-		ITopic<E> topic = getTopic(name);
-		topic.addMessageListener(listener);
-	}
-
-	/**
-	 * Removes the topic listener from the topic with the specified name.
-	 * 
-	 * @param name
-	 *          the name of the topic
-	 * @param listener
-	 *          the listener to add
-	 * @param <E>
-	 *          the type of the topic items
-	 */
-	public <E> void removeListener(String name, MessageListener<E> listener) {
-		ITopic<E> topic = getTopic(name);
-		topic.removeMessageListener(listener);
-	}
-
 }

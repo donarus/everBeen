@@ -1,24 +1,22 @@
 package cz.cuni.mff.d3s.been.cluster.query;
 
-import static cz.cuni.mff.d3s.been.core.task.TaskExclusivity.NON_EXCLUSIVE;
-
-import java.util.List;
-
+import com.hazelcast.query.Predicate;
+import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
+import cz.cuni.mff.d3s.been.core.ri.RuntimeInfos;
+import cz.cuni.mff.d3s.been.core.task.TaskExclusivity;
 import org.apache.commons.jxpath.JXPathContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.core.MapEntry;
-import com.hazelcast.query.Predicate;
+import java.util.List;
+import java.util.Map;
 
-import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
-import cz.cuni.mff.d3s.been.core.ri.RuntimeInfos;
-import cz.cuni.mff.d3s.been.core.task.TaskExclusivity;
+import static cz.cuni.mff.d3s.been.core.task.TaskExclusivity.NON_EXCLUSIVE;
 
 /**
- * 
+ *
  * Predicate for filtering RuntimeInfo based on XPath expression.
- * 
+ *
  * @author Martin Sixta
  */
 public final class XPathPredicate implements Predicate<String, RuntimeInfo> {
@@ -31,7 +29,7 @@ public final class XPathPredicate implements Predicate<String, RuntimeInfo> {
 
 	/**
 	 * Creates new XPathPredicate
-	 * 
+	 *
 	 * @param contextId
 	 *          ID of the context to take into account while filtering
 	 * @param xpath
@@ -46,7 +44,7 @@ public final class XPathPredicate implements Predicate<String, RuntimeInfo> {
 	}
 
 	@Override
-	public boolean apply(MapEntry<String, RuntimeInfo> mapEntry) {
+	public boolean apply(Map.Entry<String, RuntimeInfo> mapEntry) {
 		RuntimeInfo info = mapEntry.getValue();
 
 		if (info.getExclusivity() == null) {

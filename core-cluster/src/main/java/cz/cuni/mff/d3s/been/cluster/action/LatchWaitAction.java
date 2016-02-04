@@ -1,16 +1,15 @@
 package cz.cuni.mff.d3s.been.cluster.action;
 
-import static com.hazelcast.core.Instance.InstanceType.COUNT_DOWN_LATCH;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.hazelcast.core.ICountDownLatch;
-import com.hazelcast.core.InstanceDestroyedException;
-import com.hazelcast.core.MemberLeftException;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.socketworks.twoway.Replies;
 import cz.cuni.mff.d3s.been.socketworks.twoway.Reply;
 import cz.cuni.mff.d3s.been.task.checkpoints.CheckpointRequest;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * An {@link Action} that handles a request for a waiting until a latch becomes
@@ -44,7 +43,7 @@ final class LatchWaitAction implements Action {
 	public Reply handle() {
 		String latchName = Actions.latchNameForRequest(request);
 
-		if (!ctx.containsInstance(COUNT_DOWN_LATCH, latchName)) {
+		if (!ctx.containsCountDownLatch(latchName)) {
 			return Replies.createErrorReply("No such Count Down Latch '%s'", latchName);
 		}
 
@@ -61,8 +60,9 @@ final class LatchWaitAction implements Action {
 
 			if (request.getTimeout() == 0) {
 				// await() will return after hazelcast.max.operation.timeout no matter what
-				while (countDownLatch.hasCount()) {
-					countDownLatch.await();
+				// in hc3 timeoutless method has been removed, in hc2 timeout was 10s by default
+				while (countDownLatch.getCount() > 0) {
+					countDownLatch.await(10, TimeUnit.SECONDS);
 				}
 				waitResult = true;
 			} else {
@@ -75,7 +75,7 @@ final class LatchWaitAction implements Action {
 				return Replies.createErrorReply("TIMEOUT");
 			}
 
-		} catch (InstanceDestroyedException | MemberLeftException | InterruptedException e) {
+		} catch ( InterruptedException e) {
 			return Replies.createErrorReply(e.getMessage());
 		}
 	}
