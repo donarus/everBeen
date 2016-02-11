@@ -12,6 +12,12 @@
 	</parent>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.2.4.RELEASE</version>
+		</dependency>
 		<!-- BEEN MODULES -->
 		<dependency>
 			<groupId>cz.cuni.mff.d3s.been</groupId>

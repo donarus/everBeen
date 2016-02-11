@@ -13,7 +13,7 @@ public class SubmitBenchmarkDescriptor extends SubmitTaskDescriptor {
 
 	@Override
 	protected void submitTaskDescriptor(TaskDescriptor taskDescriptor) throws BeenApiException {
-		getApi().submitBenchmark(taskDescriptor);
+		getBeenApi().submitBenchmark(taskDescriptor);
 	}
 
 }

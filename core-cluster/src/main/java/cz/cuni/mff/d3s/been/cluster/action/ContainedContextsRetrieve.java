@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.been.cluster.action;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.core.task.TaskContextEntry;
 import cz.cuni.mff.d3s.been.core.task.TaskContextStateInfo;
@@ -20,9 +21,7 @@ public class ContainedContextsRetrieve implements Action {
 
 	/** the request to handle */
 	private final Request request;
-
-	/** BEEN cluster instance */
-	private final ClusterContext ctx;
+	private Benchmarks benchmarks;
 
 	/**
 	 * Default constructor, creates the action with the specified request and
@@ -30,19 +29,17 @@ public class ContainedContextsRetrieve implements Action {
 	 * 
 	 * @param request
 	 *          the request to handle
-	 * @param ctx
-	 *          the cluster context
 	 */
-	public ContainedContextsRetrieve(CheckpointRequest request, ClusterContext ctx) {
+	public ContainedContextsRetrieve(CheckpointRequest request, Benchmarks benchmarks) {
 		this.request = request;
-		this.ctx = ctx;
+		this.benchmarks = benchmarks;
 	}
 
 	@Override
 	public Reply handle() {
 		String benchmarkId = this.request.getSelector();
 		TaskContextStateInfo info = new TaskContextStateInfo();
-		for (TaskContextEntry taskContextEntry : ctx.getBenchmarks().getTaskContextsInBenchmark(benchmarkId)) {
+		for (TaskContextEntry taskContextEntry : benchmarks.getTaskContextsInBenchmark(benchmarkId)) {
 			TaskContextStateInfo.Item i = new TaskContextStateInfo.Item();
 			i.state = taskContextEntry.getContextState();
 			i.taskContextId = taskContextEntry.getId();

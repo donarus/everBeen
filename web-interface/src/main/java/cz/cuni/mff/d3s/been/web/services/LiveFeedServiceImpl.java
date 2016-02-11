@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
+import com.hazelcast.core.MapEvent;
 import cz.cuni.mff.d3s.been.api.BeenApiException;
 import org.apache.tapestry5.ioc.Invokable;
 import org.apache.tapestry5.ioc.services.ParallelExecutor;
@@ -50,7 +51,17 @@ public class LiveFeedServiceImpl implements LiveFeedService {
                 try {
 
                     EntryListener<String, String> logsListener = new EntryListener<String, String>() {
-                        @Override
+						@Override
+						public void mapEvicted(MapEvent event) {
+
+						}
+
+						@Override
+						public void mapCleared(MapEvent event) {
+
+						}
+
+						@Override
                         public void entryAdded(EntryEvent<String, String> event) {
                             broadcast("/logs", event.getValue());
                         }

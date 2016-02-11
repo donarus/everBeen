@@ -59,7 +59,7 @@ public class Detail extends Page {
 		if (benchmark != null) {
 			this.generator = api.getApi().getTask(benchmark.getGeneratorId());
 			this.contexts = api.getApi().getTaskContextsInBenchmark(benchmarkId);
-			this.removable = new BenchmarkSupport(getApi()).isBenchmarkRemovable(benchmark.getId());
+			this.removable = new BenchmarkSupport(getBeenApi()).isBenchmarkRemovable(benchmark.getId());
 		}
 	}
 
@@ -84,15 +84,15 @@ public class Detail extends Page {
 
 	// reloads fresh instance from hazelacast cluster.
 	private TaskEntry getGenerator(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).getGenerator(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).getGenerator(benchmarkId);
 	}
 
 	public boolean isBenchmarkInFinalState(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).isBenchmarkInFinalState(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).isBenchmarkInFinalState(benchmarkId);
 	}
 
 	public boolean isBenchmarkRemovable(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).isBenchmarkRemovable(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).isBenchmarkRemovable(benchmarkId);
 	}
 
 }

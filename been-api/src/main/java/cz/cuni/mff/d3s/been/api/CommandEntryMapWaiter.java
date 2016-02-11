@@ -4,6 +4,7 @@ import java.util.Queue;
 
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
+import com.hazelcast.core.MapEvent;
 import cz.cuni.mff.d3s.been.core.protocol.command.CommandEntry;
 
 /**
@@ -73,4 +74,13 @@ final class CommandEntryMapWaiter implements EntryListener<Long, CommandEntry> {
 		queue.add(event.getValue());
 	}
 
+	@Override
+	public void mapCleared(MapEvent event) {
+		
+	}
+
+	@Override
+	public void mapEvicted(MapEvent event) {
+
+	}
 }

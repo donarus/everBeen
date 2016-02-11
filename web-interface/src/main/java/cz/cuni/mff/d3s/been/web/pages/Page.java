@@ -183,7 +183,7 @@ public abstract class Page {
 		return this.api.getApi().isSwRepositoryOnline();
 	}
 
-	protected BeenApi getApi() throws ClusterConnectionUnavailableException {
+	protected BeenApi getBeenApi() throws ClusterConnectionUnavailableException {
 		return this.api.getApi();
 	}
 

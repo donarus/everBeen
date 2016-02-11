@@ -1,13 +1,17 @@
 package cz.cuni.mff.d3s.been.swrepoclient;
 
 import cz.cuni.mff.d3s.been.datastore.SoftwareStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Factory for <em>Software Repository</em> clients
  */
+@Component
 public class SwRepoClientFactory {
 
-	private final SoftwareStore softwareCache;
+	@Autowired
+	private SoftwareStore softwareCache;
 
 	/**
 	 * Create a client factory

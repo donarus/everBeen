@@ -60,6 +60,7 @@ public class Exception extends Page implements ExceptionReporter {
 
             t = t.getCause();
         }
+        exception.printStackTrace();
 
         log.error("Exception in web interface.", exception);
     }

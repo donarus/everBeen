@@ -19,31 +19,29 @@ import cz.cuni.mff.d3s.been.core.task.TaskEntry;
 import cz.cuni.mff.d3s.been.core.task.TaskState;
 import cz.cuni.mff.d3s.been.persistence.DAOException;
 import cz.cuni.mff.d3s.been.persistence.task.PersistentDescriptors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for BEEN tasks stored in Hazelcast map.
  * 
  * @author Martin Sixta
  */
+@Component
 public class Tasks {
 
 	/** slf4j logger */
 	private static final Logger log = LoggerFactory.getLogger(Tasks.class);
 
 	/** BEEN cluster connection */
+	@Autowired
 	private ClusterContext clusterCtx;
 
-	/**
-	 * Package private constructor, creates a new instance that uses the specified
-	 * BEEN cluster context.
-	 * 
-	 * @param clusterCtx
-	 *          the cluster context to use
-	 */
-	Tasks(ClusterContext clusterCtx) {
-		// package private visibility prevents out-of-package instantiation
-		this.clusterCtx = clusterCtx;
-	}
+	@Autowired
+	private Persistence persistence;
+
+	@Autowired
+	private Topics topics;
 
 	/**
 	 * Returns Tasks map.
@@ -145,7 +143,7 @@ public class Tasks {
 				taskEntry.getTaskContextId(),
 				taskEntry.getBenchmarkId());
 		try {
-			clusterCtx.getPersistence().asyncPersist(PersistentDescriptors.TASK_DESCRIPTOR, entity);
+			persistence.asyncPersist(PersistentDescriptors.TASK_DESCRIPTOR, entity);
 		} catch (DAOException e) {
 			log.error("Persisting context descriptor failed.", e);
 			// continues without rethrowing, because the only reason for a DAOException is when
@@ -228,7 +226,7 @@ public class Tasks {
 
 		// this is tricky, the task has not been scheduled as of time of getTask() but ..
 		if (state == WAITING) {
-			final IMap<String, TaskEntry> tasksMap = clusterCtx.getTasks().getTasksMap();
+			final IMap<String, TaskEntry> tasksMap = getTasksMap();
 
 			// ... we need to lock it ...
 			try {
@@ -254,7 +252,7 @@ public class Tasks {
 
 		String receiverId = taskEntry.getRuntimeId();
 		KillTaskMessage killMessage = new KillTaskMessage(receiverId, "killed by user", taskId);
-		clusterCtx.getTopics().publishInGlobalTopic(killMessage);
+		topics.publishInGlobalTopic(killMessage);
 	}
 
 }

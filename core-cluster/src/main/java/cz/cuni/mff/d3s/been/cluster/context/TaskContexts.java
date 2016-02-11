@@ -9,6 +9,8 @@ import cz.cuni.mff.d3s.been.persistence.DAOException;
 import cz.cuni.mff.d3s.been.persistence.task.PersistentDescriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -19,25 +21,25 @@ import static cz.cuni.mff.d3s.been.cluster.Names.BENCHMARKS_CONTEXT_ID;
  * 
  * @author Kuba Brecka
  */
+@Component
 public class TaskContexts {
 
 	/** slf4j logger */
 	private static final Logger log = LoggerFactory.getLogger(TaskContexts.class);
 
 	/** BEEN cluster connection */
+	@Autowired
 	private ClusterContext clusterContext;
 
-	/**
-	 * Package private constructor, creates a new instance that uses the specified
-	 * BEEN cluster context.
-	 * 
-	 * @param clusterContext
-	 *          the cluster context to use
-	 */
-	TaskContexts(ClusterContext clusterContext) {
-		// package private visibility prevents out-of-package instantiation
-		this.clusterContext = clusterContext;
-	}
+
+	@Autowired
+	private Persistence persistence;
+
+	@Autowired
+	private Benchmarks benchmarks;
+
+	@Autowired
+	private Tasks tasks;
 
 	/**
 	 * Returns the map which holds task context entries.
@@ -129,7 +131,7 @@ public class TaskContexts {
 				contextEntry.getId(),
 				benchmarkId);
 		try {
-			clusterContext.getPersistence().asyncPersist(PersistentDescriptors.CONTEXT_DESCRIPTOR, entity);
+			persistence.asyncPersist(PersistentDescriptors.CONTEXT_DESCRIPTOR, entity);
 		} catch (DAOException e) {
 			log.error("Persisting context descriptor failed.", e);
 			// continues without rethrowing, because the only reason for a DAOException is when
@@ -226,8 +228,7 @@ public class TaskContexts {
 
 		TaskEntry taskEntry = TaskEntries.create(benchmarkTaskDescriptor, BENCHMARKS_CONTEXT_ID);
 		taskEntry.setBenchmarkId(benchmarkId);
-		String taskId = clusterContext.getTasks().submit(taskEntry);
-		clusterContext.getBenchmarks().addBenchmarkToBenchmarksContext(taskEntry);
+		benchmarks.addBenchmarkToBenchmarksContext(taskEntry);
 
 		return taskEntry.getId();
 	}
@@ -302,7 +303,7 @@ public class TaskContexts {
 		// TODO consider transactions
 		for (TaskEntry taskEntry : entriesToSubmit) {
 			taskEntry.setBenchmarkId(contextEntry.getBenchmarkId());
-			String taskId = clusterContext.getTasks().submit(taskEntry);
+			String taskId = tasks.submit(taskEntry);
 			contextEntry.getContainedTask().add(taskId);
 			log.debug("Task was submitted with ID {}", taskId);
 		}
@@ -417,7 +418,7 @@ public class TaskContexts {
 			log.info("Removing task context {} from map.", taskContextId);
 
 			for (String taskId : taskContextEntry.getContainedTask()) {
-				clusterContext.getTasks().remove(taskId);
+				tasks.remove(taskId);
 			}
 
 			getTaskContextsMap().remove(taskContextId);
@@ -441,7 +442,7 @@ public class TaskContexts {
 
 		Collection<TaskEntry> result = new ArrayList<>();
 		for (String taskId : taskContextEntry.getContainedTask()) {
-			TaskEntry entry = clusterContext.getTasks().getTask(taskId);
+			TaskEntry entry = tasks.getTask(taskId);
 			if (entry != null) {
 				result.add(entry);
 			}
@@ -473,7 +474,7 @@ public class TaskContexts {
 		List<String> containedTasks = taskContextEntry.getContainedTask();
 
 		for (String taskId : containedTasks) {
-			clusterContext.getTasks().kill(taskId);
+			tasks.kill(taskId);
 		}
 	}
 

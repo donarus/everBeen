@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.been.cluster.context;
 
 import static cz.cuni.mff.d3s.been.cluster.ClusterPersistenceConfiguration.*;
 
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -19,48 +20,55 @@ import cz.cuni.mff.d3s.been.persistence.QueryAnswerFactory;
 import cz.cuni.mff.d3s.been.util.JSONUtils;
 import cz.cuni.mff.d3s.been.util.JsonException;
 import cz.cuni.mff.d3s.been.util.PropertyReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Cluster-based operations related to object persistence and retrieval
  * 
  * @author darklight
  */
+@Component
 public class Persistence {
 
 	/** timeout for persistence queries in seconds */
-	private final Long queryTimeout;
+	private Long queryTimeout;
 
 	/** timeout for query processing in seconds */
-	private final Long queryProcessingTimeout;
+	private Long queryProcessingTimeout;
 
 	/** asynchronous queue for persistence entities */
-	private final IQueue<EntityCarrier> asyncPersistence;
+	private IQueue<EntityCarrier> asyncPersistence;
 
 	/** queue for persistence queries */
-	private final IQueue<Query> queryQueue;
+	private IQueue<Query> queryQueue;
 
 	/** map for persistence query answers */
-	private final IMap<String, QueryAnswer> queryAnswerMap;
+	private IMap<String, QueryAnswer> queryAnswerMap;
 
 	/** utility class for (de)serialization */
-	private final JSONUtils jsonUtils;
+	private JSONUtils jsonUtils;
 
-	/**
-	 * Package private constructor, creates a new instance that uses the specified
-	 * BEEN cluster context.
-	 * 
-	 * @param ctx
-	 *          the cluster context to use
-	 */
-	Persistence(ClusterContext ctx) {
-		final PropertyReader propertyReader = PropertyReader.on(ctx.getProperties());
+	@Autowired
+	private ClusterContext clusterContext;
+
+	@Autowired
+	private Properties properties;
+
+	@PostConstruct
+	private void initialize() {
+		final PropertyReader propertyReader = PropertyReader.on(properties);
 		this.queryTimeout = propertyReader.getLong(QUERY_TIMEOUT, DEFAULT_QUERY_TIMEOUT);
 		this.queryProcessingTimeout = propertyReader.getLong(QUERY_PROCESSING_TIMEOUT, DEFAULT_QUERY_PROCESSING_TIMEOUT);
 
-		this.asyncPersistence = ctx.getQueue(Names.PERSISTENCE_QUEUE_NAME);
-		this.queryAnswerMap = ctx.getMap(Names.PERSISTENCE_QUERY_ANSWERS_MAP_NAME);
-		this.queryQueue = ctx.getQueue(Names.PERSISTENCE_QUERY_QUEUE_NAME);
+		this.asyncPersistence = clusterContext.getQueue(Names.PERSISTENCE_QUEUE_NAME);
+		this.queryAnswerMap = clusterContext.getMap(Names.PERSISTENCE_QUERY_ANSWERS_MAP_NAME);
+		this.queryQueue = clusterContext.getQueue(Names.PERSISTENCE_QUERY_QUEUE_NAME);
 		this.jsonUtils = JSONUtils.newInstance();
+
 	}
 
 	/**

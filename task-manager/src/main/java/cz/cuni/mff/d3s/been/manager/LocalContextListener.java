@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.been.manager;
 
+import com.hazelcast.core.MapEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,10 @@ import cz.cuni.mff.d3s.been.manager.msg.Messages;
 import cz.cuni.mff.d3s.been.manager.msg.TaskMessage;
 import cz.cuni.mff.d3s.been.mq.IMessageSender;
 import cz.cuni.mff.d3s.been.mq.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 
@@ -22,39 +27,35 @@ import cz.cuni.mff.d3s.been.mq.MessagingException;
  * 
  * @author Martin Sixta
  */
+@Component
 final class LocalContextListener extends TaskManagerService implements EntryListener<String, TaskContextEntry> {
 
 	/** logging */
 	private static final Logger log = LoggerFactory.getLogger(LocalContextListener.class);
 
-	private final TaskContexts contexts;
-	private final IMap<String, TaskContextEntry> contextsMap;
-	private final ClusterContext clusterCtx;
-	private final PersistentContextStateRegistrar persistentStateRegistrar;
-	private IMessageSender<TaskMessage> sender;
+	@Autowired
+	private TaskContexts taskContexts;
+	private IMap<String, TaskContextEntry> contextsMap;
+	@Autowired
+	private PersistentContextStateRegistrar persistentStateRegistrar;
 
-	/**
-	 * Creates new LocalContextListener.
-	 * 
-	 * @param clusterCtx
-	 *          connection to the cluster
-	 */
-	LocalContextListener(ClusterContext clusterCtx) {
-		this.clusterCtx = clusterCtx;
-		this.contexts = clusterCtx.getTaskContexts();
-		this.contextsMap = contexts.getTaskContextsMap();
-		this.persistentStateRegistrar = new PersistentContextStateRegistrar(clusterCtx);
+	private IMessageSender<TaskMessage> sender;
+	private String listenerId;
+
+	@PostConstruct
+	private void initialize() {
+		this.contextsMap = taskContexts.getTaskContextsMap();
 	}
 
 	@Override
 	public void start() throws ServiceException {
 		sender = createSender();
-		contextsMap.addLocalEntryListener(this);
+		this.listenerId = contextsMap.addLocalEntryListener(this);
 	}
 
 	@Override
 	public void stop() {
-		contextsMap.removeEntryListener(this);
+		contextsMap.removeEntryListener(this.listenerId);
 		sender.close();
 	}
 
@@ -63,7 +64,7 @@ final class LocalContextListener extends TaskManagerService implements EntryList
 		final TaskContextEntry entry = event.getValue();
 
 		try {
-			TaskMessage msg = Messages.createRunContextMessage(entry.getId());
+			TaskMessage msg = Messages.createRunContextMessage(entry.getId(), taskContexts);
 			sender.send(msg);
 		} catch (MessagingException e) {
 			String msg = String.format("Cannot send message to '%s'", sender.getConnection());
@@ -82,4 +83,14 @@ final class LocalContextListener extends TaskManagerService implements EntryList
 
 	@Override
 	public void entryEvicted(EntryEvent<String, TaskContextEntry> event) {}
+
+	@Override
+	public void mapCleared(MapEvent event) {
+
+	}
+
+	@Override
+	public void mapEvicted(MapEvent event) {
+
+	}
 }

@@ -33,14 +33,14 @@ public class Submit extends Page {
 	private PageRenderLinkSource pageRenderLinkSource;
 
 	public Collection<BpkIdentifier> getBpks() throws BeenApiException {
-		return getApi().getBpks();
+		return getBeenApi().getBpks();
 	}
 
 	Object onDeleteNamedTaskDescriptor(String name, String groupId, String bpkId, String version) throws BeenApiException {
 		BpkIdentifier bpkIdentifier = new ObjectFactory().createBpkIdentifier().withBpkId(bpkId).withGroupId(groupId).withVersion(
 				version);
 
-		getApi().deleteNamedTaskDescriptor(bpkIdentifier, name);
+		getBeenApi().deleteNamedTaskDescriptor(bpkIdentifier, name);
 
 		return Submit.class;
 	}
@@ -50,7 +50,7 @@ public class Submit extends Page {
 		BpkIdentifier bpkIdentifier = new ObjectFactory().createBpkIdentifier().withBpkId(bpkId).withGroupId(groupId).withVersion(
 				version);
 
-		getApi().deleteNamedTaskContextDescriptor(bpkIdentifier, name);
+		getBeenApi().deleteNamedTaskContextDescriptor(bpkIdentifier, name);
 
 		return Submit.class;
 	}
@@ -67,8 +67,8 @@ public class Submit extends Page {
 	private Collection<Descriptor> createTaskDescriptorWrappers(BpkIdentifier bpk) throws BeenApiException {
 		Collection<Descriptor> descriptors = new ArrayList();
 
-		descriptors.addAll(createTaskDescriptorWrappers(getApi().getTaskDescriptors(bpk).entrySet(), bpk, false));
-		descriptors.addAll(createTaskDescriptorWrappers(getApi().getNamedTaskDescriptorsForBpk(bpk).entrySet(), bpk, true));
+		descriptors.addAll(createTaskDescriptorWrappers(getBeenApi().getTaskDescriptors(bpk).entrySet(), bpk, false));
+		descriptors.addAll(createTaskDescriptorWrappers(getBeenApi().getNamedTaskDescriptorsForBpk(bpk).entrySet(), bpk, true));
 
 		return descriptors;
 	}
@@ -77,11 +77,11 @@ public class Submit extends Page {
 		Collection<Descriptor> descriptors = new ArrayList();
 
 		descriptors.addAll(createTaskContextDescriptorWrappers(
-				getApi().getTaskContextDescriptors(bpk).entrySet(),
+				getBeenApi().getTaskContextDescriptors(bpk).entrySet(),
 				bpk,
 				false));
 		descriptors.addAll(createTaskContextDescriptorWrappers(
-				getApi().getNamedContextDescriptorsForBpk(bpk).entrySet(),
+				getBeenApi().getNamedContextDescriptorsForBpk(bpk).entrySet(),
 				bpk,
 				true));
 

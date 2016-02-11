@@ -31,17 +31,17 @@ final class AbortTaskAction implements TaskAction {
 	/**
 	 * Creates a new action that schedules tasks
 	 * 
-	 * @param ctx
+	 * @param tasks
 	 *          connection to the cluster
 	 * @param entry
 	 *          the entry to take action on
 	 * @param msg
 	 *          why the task was aborted
 	 */
-	public AbortTaskAction(final ClusterContext ctx, final TaskEntry entry, final String msg) {
+	public AbortTaskAction(Tasks tasks, final TaskEntry entry, final String msg) {
 		this.entry = entry;
 		this.msg = msg;
-		this.tasks = ctx.getTasks();
+		this.tasks = tasks;
 		this.map = tasks.getTasksMap();
 	}
 	@Override

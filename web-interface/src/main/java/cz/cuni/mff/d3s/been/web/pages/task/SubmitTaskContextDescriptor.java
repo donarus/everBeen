@@ -227,10 +227,10 @@ public class SubmitTaskContextDescriptor extends Page {
 	Object onActivate(String groupId, String bpkId, String version, String descriptorName) throws BeenApiException {
 		// load correct task context descriptor
 		bpkIdentifier = new BpkIdentifier().withGroupId(groupId).withBpkId(bpkId).withVersion(version);
-		this.taskContextDescriptor = getApi().getTaskContextDescriptor(bpkIdentifier, descriptorName);
+		this.taskContextDescriptor = getBeenApi().getTaskContextDescriptor(bpkIdentifier, descriptorName);
 
 		if (this.taskContextDescriptor == null) {
-			this.taskContextDescriptor = getApi().getNamedContextDescriptorsForBpk(bpkIdentifier).get(descriptorName);
+			this.taskContextDescriptor = getBeenApi().getNamedContextDescriptorsForBpk(bpkIdentifier).get(descriptorName);
 		}
 
 		HashMap<String, Object> conversationArgs = new HashMap<String, Object>();
@@ -317,10 +317,10 @@ public class SubmitTaskContextDescriptor extends Page {
 	@SuppressWarnings("unused")
 	Object onSubmitFromSubmitTaskContextForm() throws BeenApiException {
 		if (save) {
-			getApi().saveNamedContextDescriptor(taskContextDescriptor, saveName, bpkIdentifier);
+			getBeenApi().saveNamedContextDescriptor(taskContextDescriptor, saveName, bpkIdentifier);
 		}
 
-		getApi().submitTaskContext(taskContextDescriptor);
+		getBeenApi().submitTaskContext(taskContextDescriptor);
 		return Overview.class;
 	}
 

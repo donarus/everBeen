@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.been.manager.action;
 
 import java.util.Collection;
 
+import cz.cuni.mff.d3s.been.cluster.context.Tasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,29 +20,26 @@ import cz.cuni.mff.d3s.been.core.task.TaskState;
  * @author Kuba Brecka
  */
 final class TaskContextCheckerAction implements TaskAction {
-	/** logging */
-	private static final Logger log = LoggerFactory.getLogger(TaskContextCheckerAction.class);
 
-	/** connection to the cluster */
-	private final ClusterContext ctx;
 
 	/** task entry used for the context check */
 	private final TaskEntry entry;
+	private TaskContexts taskContexts;
+	private Tasks tasks;
 
 	/** format of sql query predicate for finding all unfinished tasks */
 	private static final String QUERY_FORMAT = "taskContextId = '%s' AND ((state == %s) OR (state == %s))";
 
 	/**
 	 * Creates new context checker action.
-	 * 
-	 * @param ctx
-	 *          connection to the cluster
+	 *
 	 * @param entry
 	 *          targeted task entry
 	 */
-	public TaskContextCheckerAction(ClusterContext ctx, TaskEntry entry) {
-		this.ctx = ctx;
+	public TaskContextCheckerAction(TaskEntry entry, TaskContexts taskContexts, Tasks tasks) {
 		this.entry = entry;
+		this.taskContexts = taskContexts;
+		this.tasks = tasks;
 	}
 
 	/**
@@ -56,13 +54,12 @@ final class TaskContextCheckerAction implements TaskAction {
 	@Override
 	public void execute() throws TaskActionException {
 		final String taskContextId = entry.getTaskContextId();
-		final TaskContexts contexts = ctx.getTaskContexts();
 
-		IMap<String, TaskContextEntry> contextsMap = ctx.getTaskContexts().getTaskContextsMap();
-		IMap<String, TaskEntry> tasksMap = ctx.getTasks().getTasksMap();
+		IMap<String, TaskContextEntry> contextsMap = taskContexts.getTaskContextsMap();
+		IMap<String, TaskEntry> tasksMap = tasks.getTasksMap();
 
 		// fetch the entry
-		TaskContextEntry contextEntry = contexts.getTaskContext(taskContextId);
+		TaskContextEntry contextEntry = taskContexts.getTaskContext(taskContextId);
 
 		// optimization: fist check, and if needed then lock and check again
 		if (isContextDone(contextEntry)) {
@@ -78,7 +75,7 @@ final class TaskContextCheckerAction implements TaskAction {
 			contextsMap.lock(taskContextId); // LOCK BEGIN
 
 			// must fetch again
-			contextEntry = contexts.getTaskContext(taskContextId);
+			contextEntry = taskContexts.getTaskContext(taskContextId);
 
 			if (isContextDone(contextEntry)) {
 				return;
@@ -97,9 +94,9 @@ final class TaskContextCheckerAction implements TaskAction {
 				contextEntry.setContextState(finalState);
 
 				if (finalState == TaskContextState.FINISHED) {
-					ctx.getTaskContexts().cleanupTaskContext(contextEntry);
+					taskContexts.cleanupTaskContext(contextEntry);
 				} else {
-					ctx.getTaskContexts().putContextEntry(contextEntry);
+					taskContexts.putContextEntry(contextEntry);
 				}
 			}
 		} finally {

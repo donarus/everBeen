@@ -5,6 +5,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.TimeoutException;
 
+import cz.cuni.mff.d3s.been.cluster.context.Runtimes;
+import cz.cuni.mff.d3s.been.cluster.context.Topics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,25 +44,23 @@ final class ScheduleTaskAction implements TaskAction {
 
 	/** tasks utility class */
 	final Tasks tasks;
-
-	/** connection to the cluster */
-	private final ClusterContext ctx;
+	private Runtimes runtimes;
+	private Topics topics;
 
 	/** the task to schedule */
 	private TaskEntry entry;
 
 	/**
 	 * Creates a new action that schedules tasks
-	 * 
-	 * @param ctx
-	 *          connection to the cluster
+	 *
 	 * @param entry
 	 *          task to schedule
 	 */
-	public ScheduleTaskAction(final ClusterContext ctx, final TaskEntry entry) {
-		this.ctx = ctx;
+	public ScheduleTaskAction(final TaskEntry entry, Tasks tasks, Runtimes runtimes, Topics topics) {
 		this.entry = entry;
-		this.tasks = ctx.getTasks();
+		this.tasks = tasks;
+		this.runtimes = runtimes;
+		this.topics = topics;
 		this.map = tasks.getTasksMap();
 	}
 
@@ -74,10 +74,13 @@ final class ScheduleTaskAction implements TaskAction {
 		try {
 
 			// 1) Find suitable Host Runtime
-			String receiverId = RuntimeSelectors.fromEntry(entry, ctx).select();
+			String receiverId = RuntimeSelectors.fromEntry(entry, runtimes).select();
 
 			// 2) Lock the entry
-			TaskEntry entryCopy = map.tryLockAndGet(id, LOCK_TIMEOUT, SECONDS);
+			if(map.tryLock(id, LOCK_TIMEOUT, SECONDS)) {
+				throw new TimeoutException();
+			}
+			TaskEntry entryCopy = map.get(id);
 
 			// check that we are processing unchanged entry
 			if (!areEqual(entry, entryCopy)) {
@@ -98,7 +101,7 @@ final class ScheduleTaskAction implements TaskAction {
 			map.unlock(id);
 
 			// 5) Send a message to the runtime
-			ctx.getTopics().publishInGlobalTopic(newRunTaskMessage());
+			topics.publishInGlobalTopic(newRunTaskMessage());
 
 			log.debug("Task {} scheduled on {}", id, receiverId);
 
@@ -109,6 +112,9 @@ final class ScheduleTaskAction implements TaskAction {
 			stashTask("No suitable host found");
 		} catch (TimeoutException e) {
 			log.warn("Could not lock task {} in {}. Will try later if needed.", id, LOCK_TIMEOUT);
+			// will get to it later
+		} catch (InterruptedException e) {
+			log.warn("Interrupted while trying to ibtain the lock for task {} in. Will try later if needed.", id);
 			// will get to it later
 		} finally {
 			if (map.isLocked(id)) {

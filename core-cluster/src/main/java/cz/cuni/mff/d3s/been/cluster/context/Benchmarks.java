@@ -18,6 +18,10 @@ import cz.cuni.mff.d3s.been.core.benchmark.ResubmitHistory;
 import cz.cuni.mff.d3s.been.core.benchmark.ResubmitHistoryItem;
 import cz.cuni.mff.d3s.been.core.benchmark.Storage;
 import cz.cuni.mff.d3s.been.core.task.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 
@@ -29,27 +33,22 @@ import cz.cuni.mff.d3s.been.core.task.*;
  * 
  * @author Martin Sixta
  */
+@Component
 public class Benchmarks {
 
 	/** slf4j logger */
 	private static final Logger log = LoggerFactory.getLogger(Benchmarks.class);
 
 	/** Connection to the cluster */
-	private final ClusterContext clusterContext;
+	@Autowired
+	private ClusterContext clusterContext;
 
 	/** Tasks context */
-	private final TaskContexts taskContexts;
+	@Autowired
+	private TaskContexts taskContexts;
 
-	/**
-	 * Package private constructor.
-	 * 
-	 * @param clusterContext
-	 *          the BEEN cluster context
-	 */
-	Benchmarks(ClusterContext clusterContext) {
-		this.clusterContext = clusterContext;
-		this.taskContexts = clusterContext.getTaskContexts();
-	}
+	@Autowired
+	private Tasks tasks;
 
 	/**
 	 * Returns the map which holds all benchmark entries.
@@ -236,7 +235,7 @@ public class Benchmarks {
 	public String resubmit(BenchmarkEntry benchmarkEntry) {
 		String benchmarkId = benchmarkEntry.getId();
 		String oldGeneratorId = benchmarkEntry.getGeneratorId();
-		TaskEntry generatorEntry = clusterContext.getTasks().getTask(oldGeneratorId);
+		TaskEntry generatorEntry = tasks.getTask(oldGeneratorId);
 		TaskDescriptor benchmarkTaskDescriptor = generatorEntry.getTaskDescriptor();
 		String oldRuntimeId = generatorEntry.getRuntimeId();
 
@@ -267,28 +266,28 @@ public class Benchmarks {
 	public void remove(String benchmarkId) {
 		BenchmarkEntry benchmarkEntry = get(benchmarkId);
 		String generatorId = benchmarkEntry.getGeneratorId();
-		TaskEntry generatorEntry = clusterContext.getTasks().getTask(generatorId);
+		TaskEntry generatorEntry = tasks.getTask(generatorId);
 
 		if (generatorEntry == null || generatorEntry.getState() == TaskState.FINISHED || generatorEntry.getState() == TaskState.ABORTED) {
 			log.info("Removing benchmark entry {} from map.", benchmarkId);
 
 			// remove all existing contexts from the benchmark
 			for (TaskContextEntry taskContextEntry : getTaskContextsInBenchmark(benchmarkId)) {
-				clusterContext.getTaskContexts().remove(taskContextEntry.getId());
+				taskContexts.remove(taskContextEntry.getId());
 			}
 
 			// remove failed generators
 			for (ResubmitHistoryItem resubmitHistoryItem : benchmarkEntry.getResubmitHistory().getResubmitHistoryItem()) {
 				String oldGeneratorId = resubmitHistoryItem.getOldGeneratorId();
-				TaskEntry oldGeneratorEntry = clusterContext.getTasks().getTask(oldGeneratorId);
+				TaskEntry oldGeneratorEntry = tasks.getTask(oldGeneratorId);
 				if (oldGeneratorEntry != null) {
-					clusterContext.getTasks().remove(oldGeneratorId);
+					tasks.remove(oldGeneratorId);
 					removeBenchmarkFromBenchmarksContext(oldGeneratorEntry);
 				}
 			}
 
 			// remove current generator
-			clusterContext.getTasks().remove(generatorId);
+			tasks.remove(generatorId);
 
 			// remove generator from the Been special context for generators
 			if (generatorEntry != null) {
@@ -321,7 +320,7 @@ public class Benchmarks {
 
 			BenchmarkEntry benchmarkEntry = get(benchmarkId);
 			String generatorId = benchmarkEntry.getGeneratorId();
-			TaskEntry generatorEntry = clusterContext.getTasks().getTask(generatorId);
+			TaskEntry generatorEntry = tasks.getTask(generatorId);
 
 			if (generatorEntry == null) {
 				throw new IllegalStateException(String.format("The generator of benchmark %s does not exist.", benchmarkId));
@@ -337,7 +336,7 @@ public class Benchmarks {
 			benchmarkEntry.setAllowResubmit(false);
 			put(benchmarkEntry);
 
-			clusterContext.getTasks().kill(generatorId);
+			tasks.kill(generatorId);
 		} finally {
 			benchmarksMap.unlock(benchmarkId);
 		}

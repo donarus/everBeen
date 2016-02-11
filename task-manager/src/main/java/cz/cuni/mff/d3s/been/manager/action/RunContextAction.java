@@ -1,12 +1,13 @@
 package cz.cuni.mff.d3s.been.manager.action;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
+import cz.cuni.mff.d3s.been.cluster.context.TaskContexts;
 
 /**
  * @author Martin Sixta
  */
 public class RunContextAction implements TaskAction {
-	private final ClusterContext ctx;
+	private final TaskContexts taskContexts;
 	private final String contextId;
 
 	/**
@@ -17,13 +18,13 @@ public class RunContextAction implements TaskAction {
 	 * @param contextId
 	 *          targeted context id
 	 */
-	public RunContextAction(final ClusterContext ctx, final String contextId) {
-		this.ctx = ctx;
+	public RunContextAction(final TaskContexts taskContexts, final String contextId) {
+		this.taskContexts = taskContexts;
 		this.contextId = contextId;
 	}
 
 	@Override
 	public void execute() throws TaskActionException {
-		ctx.getTaskContexts().runContext(contextId);
+		taskContexts.runContext(contextId);
 	}
 }

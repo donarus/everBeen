@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 
 import javax.xml.bind.JAXBException;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
+import cz.cuni.mff.d3s.been.cluster.context.TaskContexts;
 import org.xml.sax.SAXException;
 
 import com.hazelcast.core.IMap;
@@ -29,8 +31,8 @@ public class ContextSubmitAction implements Action {
 	/** the request to handle */
 	private final Request request;
 
-	/** BEEN cluster instance */
-	private final ClusterContext ctx;
+	private final TaskContexts taskContexts;
+	private final Benchmarks benchmarks;
 
 	/**
 	 * Default constructor, creates the action with the specified request and
@@ -38,12 +40,11 @@ public class ContextSubmitAction implements Action {
 	 * 
 	 * @param request
 	 *          the request to handle
-	 * @param ctx
-	 *          the cluster context
 	 */
-	public ContextSubmitAction(Request request, ClusterContext ctx) {
+	public ContextSubmitAction(Request request, TaskContexts taskContexts, Benchmarks benchmarks) {
 		this.request = request;
-		this.ctx = ctx;
+		this.taskContexts = taskContexts;
+		this.benchmarks = benchmarks;
 	}
 
 	@Override
@@ -59,9 +60,9 @@ public class ContextSubmitAction implements Action {
 			return Replies.createErrorReply("Cannot deserialize task context descriptor.");
 		}
 
-		String taskContextEntryId = ctx.getTaskContexts().submit(taskContextDescriptor, benchmarkId);
+		String taskContextEntryId = taskContexts.submit(taskContextDescriptor, benchmarkId);
 
-		IMap<String, BenchmarkEntry> benchmarksMap = ctx.getBenchmarks().getBenchmarksMap();
+		IMap<String, BenchmarkEntry> benchmarksMap = benchmarks.getBenchmarksMap();
 		benchmarksMap.lock(benchmarkId);
 		try {
 			BenchmarkEntry entry = benchmarksMap.get(benchmarkId);

@@ -7,6 +7,7 @@ import java.util.List;
 import com.hazelcast.query.Predicate;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
+import cz.cuni.mff.d3s.been.cluster.context.Runtimes;
 import cz.cuni.mff.d3s.been.cluster.query.XPathPredicate;
 import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
 import cz.cuni.mff.d3s.been.core.task.TaskDescriptor;
@@ -19,19 +20,16 @@ import cz.cuni.mff.d3s.been.core.task.TaskExclusivity;
  * @author Martin Sixta
  */
 final class XPathRuntimeSelection implements IRuntimeSelection {
-	private ClusterContext clusterCtx;
+	private Runtimes runtimes;
 	private final TaskEntry entry;
 
 	/**
 	 * Creates XPathRuntimeSelection
-	 * 
-	 * @param clusterCtx
-	 *          connection to the cluster
 	 * @param entry
 	 *          targeted task entry
 	 */
-	public XPathRuntimeSelection(ClusterContext clusterCtx, final TaskEntry entry) {
-		this.clusterCtx = clusterCtx;
+	public XPathRuntimeSelection(Runtimes runtimes, final TaskEntry entry) {
+		this.runtimes = runtimes;
 		this.entry = entry;
 	}
 
@@ -50,7 +48,7 @@ final class XPathRuntimeSelection implements IRuntimeSelection {
 		String contextId = entry.getTaskContextId();
 		Predicate<?, ?> predicate = new XPathPredicate(contextId, xpath, exclusivity);
 
-		List<RuntimeInfo> runtimes = new ArrayList<>(clusterCtx.getRuntimes().getRuntimeMap().values(predicate));
+		List<RuntimeInfo> runtimes = new ArrayList<>(this.runtimes.getRuntimeMap().values(predicate));
 
 		if (runtimes.size() == 0) {
 			throw new NoRuntimeFoundException("Cannot find suitable Host Runtime");

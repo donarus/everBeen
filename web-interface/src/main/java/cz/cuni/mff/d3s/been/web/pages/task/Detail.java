@@ -33,7 +33,7 @@ public class Detail extends DetailPage {
 
 	public TaskEntry getTask() throws BeenApiException {
 		if (this.task == null) {
-			this.task = getApi().getTask(itemId);
+			this.task = getBeenApi().getTask(itemId);
 		}
 		return task;
 	}
@@ -56,16 +56,16 @@ public class Detail extends DetailPage {
 	}
 
 	public boolean isTaskInFinalState(String taskId) throws BeenApiException {
-		return new TaskSupport(getApi()).isTaskInFinalState(taskId);
+		return new TaskSupport(getBeenApi()).isTaskInFinalState(taskId);
 	}
 
 	Object onKillTask(String taskId) throws BeenApiException, InterruptedException {
-		new TaskSupport(getApi()).killTask(taskId);
+		new TaskSupport(getBeenApi()).killTask(taskId);
 		return pageRenderLinkSource.createPageRenderLinkWithContext(Detail.class, taskId);
 	}
 
 	Object onRemoveTask(String taskId) throws BeenApiException, InterruptedException {
-		new TaskSupport(getApi()).removeKilledTask(taskId);
+		new TaskSupport(getBeenApi()).removeKilledTask(taskId);
 		return Tree.class;
 	}
 

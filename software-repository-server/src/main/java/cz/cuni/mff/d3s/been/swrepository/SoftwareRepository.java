@@ -13,6 +13,7 @@ import cz.cuni.mff.d3s.been.core.service.ServiceInfo;
 import cz.cuni.mff.d3s.been.core.service.ServiceState;
 import cz.cuni.mff.d3s.been.datastore.SoftwareStore;
 import cz.cuni.mff.d3s.been.swrepository.httpserver.HttpServer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A cluster node that can store and provide BPKs and Maven artifacts through a
@@ -29,6 +30,9 @@ public class SoftwareRepository implements IClusterService {
 	private SoftwareStore softwareStore;
 	private ServiceInfo info;
 	private final ClusterContext clusterCtx;
+
+	@Autowired
+	private NodeType nodeType;
 
 	SoftwareRepository(ClusterContext clusterCtx, String beenId) {
 		this.clusterCtx = clusterCtx;
@@ -66,7 +70,7 @@ public class SoftwareRepository implements IClusterService {
 		info.setParam(PARAM_PORT, port);
 		info.setServiceInfo(hostName + ":" + port);
 		info.setServiceState(ServiceState.OK);
-		info.setHazelcastUuid(clusterCtx.getInstanceType() != NodeType.NATIVE
+		info.setHazelcastUuid(nodeType != NodeType.NATIVE
 				? clusterCtx.getCluster().getLocalMember().getUuid() : null);
 
 		httpServer.start();
@@ -93,16 +97,6 @@ public class SoftwareRepository implements IClusterService {
 		httpServer.stop();
 		log.info("Software repository stopped.");
 		clusterCtx.stop();
-	}
-
-	@Override
-	public Reaper createReaper() {
-		return new Reaper() {
-			@Override
-			protected void reap() throws InterruptedException {
-				SoftwareRepository.this.stop();
-			}
-		};
 	}
 
 	/**

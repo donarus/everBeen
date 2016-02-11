@@ -41,7 +41,7 @@ public class Detail extends Page {
 	}
 
 	Object onDeleteResult(String resultId) throws BeenApiException, InterruptedException {
-		new ResultSupport(getApi()).deleteResult(resultId);
+		new ResultSupport(getBeenApi()).deleteResult(resultId);
 		return List.class;
 	}
 

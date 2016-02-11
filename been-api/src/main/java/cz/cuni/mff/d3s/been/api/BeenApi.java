@@ -718,18 +718,6 @@ public interface BeenApi {
 	public void addLogListener(EntryListener<String, String> listener) throws BeenApiException;
 
 	/**
-	 * Removes the specified log listener, which will no longer receive log
-	 * messages. If this log listener is not registered, returns silently.
-	 * 
-	 * @param listener
-	 *          the log listener to remove
-	 * @throws BeenApiException
-	 *           in case of an internal exception, see {@link BeenApi} for
-	 *           discussion
-	 */
-	public void removeLogListener(EntryListener<String, String> listener) throws BeenApiException;
-
-	/**
 	 * Returns a collection of all available evaluator results. These results are
 	 * created by evaluator tasks and are stored in a single collection in the
 	 * persistence layer.

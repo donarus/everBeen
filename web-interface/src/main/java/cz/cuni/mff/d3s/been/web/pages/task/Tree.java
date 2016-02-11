@@ -52,55 +52,55 @@ public class Tree extends Page {
 	private int taskIndex;
 
 	public Collection<BenchmarkEntry> getBenchmarks() throws BeenApiException {
-		return getApi().getBenchmarks();
+		return getBeenApi().getBenchmarks();
 	}
 
 	public Collection<TaskContextEntry> contextsForBenchmark(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).getContextsForBenchmark(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).getContextsForBenchmark(benchmarkId);
 	}
 
 	public Collection<TaskEntry> tasksForContext(String contextId) throws BeenApiException {
-		return getApi().getTasksInTaskContext(contextId);
+		return getBeenApi().getTasksInTaskContext(contextId);
 	}
 
 	public String benchmarkName(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).getBenchmarkName(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).getBenchmarkName(benchmarkId);
 	}
 
 	public TaskState benchmarkState(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).getBenchmarkState(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).getBenchmarkState(benchmarkId);
 	}
 
 	public TaskEntry benchmarkGenerator(String benchmarkId) throws BeenApiException {
-		return getApi().getTask(benchmark.getGeneratorId());
+		return getBeenApi().getTask(benchmark.getGeneratorId());
 	}
 
 	public ArrayList<ArrayList<TaskEntry>> getOrphanedContexts() throws BeenApiException {
-		return new TaskContextSupport(getApi()).getOrphanedContexts();
+		return new TaskContextSupport(getBeenApi()).getOrphanedContexts();
 	}
 
 	public Object onKillBenchmark(String benchmarkId) throws BeenApiException, InterruptedException {
-		new BenchmarkSupport(getApi()).killBenchmark(benchmarkId);
+		new BenchmarkSupport(getBeenApi()).killBenchmark(benchmarkId);
 		return this;
 	}
 
 	public Object onKillContext(String contextId) throws BeenApiException, InterruptedException {
-		new TaskContextSupport(getApi()).killTaskContext(contextId);
+		new TaskContextSupport(getBeenApi()).killTaskContext(contextId);
 		return this;
 	}
 
 	public Object onRemoveBenchmark(String benchmarkId) throws BeenApiException {
-		new BenchmarkSupport(getApi()).removeKilledBenchmark(benchmarkId);
+		new BenchmarkSupport(getBeenApi()).removeKilledBenchmark(benchmarkId);
 		return this;
 	}
 
 	public Object onRemoveContext(String contextId) throws BeenApiException {
-		new TaskContextSupport(getApi()).removeKilledTaskContext(contextId);
+		new TaskContextSupport(getBeenApi()).removeKilledTaskContext(contextId);
 		return this;
 	}
 
 	public Object onRemoveFinishedBenchmarks() throws BeenApiException {
-		new BenchmarkSupport(getApi()).removedFinishedBenchmarks();
+		new BenchmarkSupport(getBeenApi()).removedFinishedBenchmarks();
 		return this;
 	}
 
@@ -109,31 +109,31 @@ public class Tree extends Page {
 	}
 
 	public boolean isContextRemovable(String contextId) throws BeenApiException {
-		return new TaskContextSupport(getApi()).isContextRemovable(contextId);
+		return new TaskContextSupport(getBeenApi()).isContextRemovable(contextId);
 	}
 
 	public boolean isBenchmarkRemovable(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).isBenchmarkRemovable(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).isBenchmarkRemovable(benchmarkId);
 	}
 
 	public boolean isBenchmarkInFinalState(String benchmarkId) throws BeenApiException {
-		return new BenchmarkSupport(getApi()).isBenchmarkInFinalState(benchmarkId);
+		return new BenchmarkSupport(getBeenApi()).isBenchmarkInFinalState(benchmarkId);
 	}
 
 	public boolean isTaskContextFinished(String contextId) throws BeenApiException {
-		return new TaskContextSupport(getApi()).isContextFinished(contextId);
+		return new TaskContextSupport(getBeenApi()).isContextFinished(contextId);
 	}
 
 	public boolean isBenchmarkWithoutFailedContexts(String benchmarkId) throws BeenApiException {
-		return !(new BenchmarkSupport(getApi()).hasBenchmarkHaveFailedContexts(benchmarkId));
+		return !(new BenchmarkSupport(getBeenApi()).hasBenchmarkHaveFailedContexts(benchmarkId));
 	}
 
 	public boolean isTaskContextInFinalState(String taskContextId) throws BeenApiException {
-		return new TaskContextSupport(getApi()).isTaskContextInFinalState(taskContextId);
+		return new TaskContextSupport(getBeenApi()).isTaskContextInFinalState(taskContextId);
 	}
 
 	public boolean isTaskInFinalState(String taskId) throws BeenApiException {
-		return new TaskSupport(getApi()).isTaskInFinalState(taskId);
+		return new TaskSupport(getBeenApi()).isTaskInFinalState(taskId);
 	}
 
 }

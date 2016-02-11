@@ -6,28 +6,20 @@ import com.hazelcast.core.IMap;
 
 import cz.cuni.mff.d3s.been.cluster.Names;
 import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for operations related to host runtimes.
  * 
  * @author Martin Sixta
  */
+@Component
 public class Runtimes {
 
 	/** BEEN cluster connection */
+	@Autowired
 	private ClusterContext clusterCtx;
-
-	/**
-	 * Package private constructor, creates a new instance that uses the specified
-	 * BEEN cluster context.
-	 * 
-	 * @param clusterCtx
-	 *          the cluster context to use
-	 */
-	Runtimes(ClusterContext clusterCtx) {
-		// package private visibility prevents out-of-package instantiation
-		this.clusterCtx = clusterCtx;
-	}
 
 	/**
 	 * @return collection clone (changes not reflected) of all registered host
@@ -38,18 +30,6 @@ public class Runtimes {
 	 */
 	public Collection<RuntimeInfo> getRuntimes() {
 		return getRuntimeMap().values();
-	}
-
-	/**
-	 * @param key
-	 *          the ID of the host runtime to retrieve
-	 * @return clone of {@link RuntimeInfo} registered in cluster. <br/>
-	 * 
-	 *         <b>Warning!</b> modifying the returned value does not change the
-	 *         original value.
-	 */
-	public RuntimeInfo getRuntimeInfo(String key) {
-		return getRuntimeMap().get(key);
 	}
 
 	/**
@@ -65,11 +45,11 @@ public class Runtimes {
 	/**
 	 * Removes stored {@link RuntimeInfo} identified by given id from cluster.
 	 * 
-	 * @param id
-	 *          the ID of the host runtime to remove
+	 * @param runtimeInfo
+	 *          the runtimeInfo to be removed
 	 */
-	public void removeRuntimeInfo(String id) {
-		getRuntimeMap().remove(id);
+	public void removeRuntimeInfo(RuntimeInfo runtimeInfo) {
+		getRuntimeMap().remove(runtimeInfo.getId());
 	}
 
 	/**

@@ -14,7 +14,6 @@ import com.hazelcast.core.RuntimeInterruptedException;
 import cz.cuni.mff.d3s.been.BeenPackageIdentifier;
 import cz.cuni.mff.d3s.been.cluster.IClusterService;
 import cz.cuni.mff.d3s.been.cluster.Names;
-import cz.cuni.mff.d3s.been.cluster.Reaper;
 import cz.cuni.mff.d3s.been.cluster.ServiceException;
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.core.persistence.Entities;
@@ -100,17 +99,6 @@ public class ServiceLogPersister implements IClusterService {
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	public Reaper createReaper() {
-		return new Reaper() {
-			@Override
-			protected void reap() throws InterruptedException {
-				ServiceLogPersister.this.stop();
-			}
-		};
-	}
-
 	private static class ServiceLogPersisterThread extends Thread {
 
 		private final IQueue<EntityCarrier> logPersistence;

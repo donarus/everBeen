@@ -80,11 +80,11 @@ public class Detail extends Page {
 	}
 
 	public boolean isTaskContextInFinalState(String taskContextId) throws BeenApiException {
-		return new TaskContextSupport(getApi()).isTaskContextInFinalState(taskContextId);
+		return new TaskContextSupport(getBeenApi()).isTaskContextInFinalState(taskContextId);
 	}
 
 	public boolean isContextRemovable(String taskContextId) throws BeenApiException {
-		return new TaskContextSupport(getApi()).isContextRemovable(taskContextId);
+		return new TaskContextSupport(getBeenApi()).isContextRemovable(taskContextId);
 	}
 
 }

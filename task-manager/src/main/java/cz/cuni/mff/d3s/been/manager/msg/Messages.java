@@ -1,6 +1,9 @@
 package cz.cuni.mff.d3s.been.manager.msg;
 
+import cz.cuni.mff.d3s.been.cluster.context.*;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
+
+import java.util.Properties;
 
 /**
  * Factory for {@link TaskMessage}s.
@@ -16,8 +19,8 @@ public class Messages {
 	 *          targeted context id
 	 * @return RunContextMessage implementation
 	 */
-	public static TaskMessage createRunContextMessage(String contextId) {
-		return new RunContextMessage(contextId);
+	public static TaskMessage createRunContextMessage(String contextId, TaskContexts taskContexts) {
+		return new RunContextMessage(contextId, taskContexts);
 	}
 
 	/**
@@ -27,8 +30,10 @@ public class Messages {
 	 *          targeted task entry
 	 * @return TaskChangedMessage implementation
 	 */
-	public static TaskMessage createTaskChangedMessage(TaskEntry entry) {
-		return new TaskChangedMessage(entry);
+	public static TaskMessage createTaskChangedMessage(TaskEntry entry, TaskContexts taskContexts,
+													   Benchmarks benchmarks, Tasks tasks, Runtimes runtimes,
+													   Topics topics, Properties properties) {
+		return new TaskChangedMessage(entry, taskContexts, benchmarks, tasks, runtimes, topics, properties);
 	}
 
 	/**
@@ -38,8 +43,8 @@ public class Messages {
 	 *          targeted task entry
 	 * @return NewTaskMessage implementation
 	 */
-	public static TaskMessage createNewTaskMessage(TaskEntry entry) {
-		return new NewTaskMessage(entry);
+	public static TaskMessage createNewTaskMessage(TaskEntry entry, Tasks tasks, Runtimes runtimes, Topics topics) {
+		return new NewTaskMessage(entry, tasks, runtimes, topics);
 	}
 
 	/**
@@ -49,8 +54,8 @@ public class Messages {
 	 *          targeted task entry
 	 * @return ScheduleTaskMessage implementation
 	 */
-	public static TaskMessage createScheduleTaskMessage(TaskEntry entry) {
-		return new ScheduleTaskMessage(entry);
+	public static TaskMessage createScheduleTaskMessage(TaskEntry entry, Tasks tasks, Runtimes runtimes, Topics topics) {
+		return new ScheduleTaskMessage(entry, tasks, runtimes, topics);
 	}
 
 	/**
@@ -60,8 +65,8 @@ public class Messages {
 	 *          targeted task entry
 	 * @return RescheduleTaskMessage implementation
 	 */
-	public static TaskMessage createRescheduleTaskMessage(TaskEntry entry) {
-		return new RescheduleTaskMessage(entry);
+	public static TaskMessage createRescheduleTaskMessage(TaskEntry entry, Tasks tasks, Runtimes runtimes, Topics topics) {
+		return new RescheduleTaskMessage(entry, tasks, runtimes, topics);
 	}
 
 	/**
@@ -71,8 +76,8 @@ public class Messages {
 	 *          targeted task entry
 	 * @return CheckSchedulabilityMessage implementation
 	 */
-	public static TaskMessage createCheckSchedulabilityMessage(TaskEntry entry) {
-		return new CheckSchedulabilityMessage(entry);
+	public static TaskMessage createCheckSchedulabilityMessage(TaskEntry entry, Tasks tasks, Runtimes runtimes, Topics topics) {
+		return new CheckSchedulabilityMessage(entry, tasks, runtimes, topics);
 	}
 
 	/**
@@ -86,7 +91,7 @@ public class Messages {
 	 *          arguments for the format
 	 * @return AbortTaskMessage implementation
 	 */
-	public static TaskMessage createAbortTaskMessage(TaskEntry entry, String reasonFormat, Object... args) {
-		return new AbortTaskMessage(entry, reasonFormat, args);
+	public static TaskMessage createAbortTaskMessage(Tasks tasks, TaskEntry entry, String reasonFormat, Object... args) {
+		return new AbortTaskMessage(tasks, entry, reasonFormat, args);
 	}
 }

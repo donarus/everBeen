@@ -24,6 +24,7 @@ abstract class QueueDrain<T> implements Service {
 	private IQueue<T> queue;
 	private Digester<T> digester;
 	private ItemCounterListener<T> itemListener;
+	private String listenerId;
 
 	protected QueueDrain(ClusterContext ctx, String queueName, SuccessAction<T> successAction, Float failRateThreshold, Long suspendTimeOnHighFailRate) {
 		this.ctx = ctx;
@@ -40,12 +41,12 @@ abstract class QueueDrain<T> implements Service {
 		itemListener = ItemCounterListener.create(digester);
 
 		digester.start();
-		queue.addItemListener(itemListener, false);
+		this.listenerId = queue.addItemListener(itemListener, false);
 	}
 
 	@Override
 	public void stop() {
-		queue.removeItemListener(itemListener);
+		queue.removeItemListener(listenerId);
 		digester.stop();
 	}
 

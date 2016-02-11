@@ -108,21 +108,6 @@ public final class Instance {
 	}
 
 	/**
-	 * Creates {@link ClusterContext} for this node.
-	 * 
-	 * @return Cluster context for this node
-	 * 
-	 * @throws IllegalStateException
-	 *           when the node is not connected
-	 */
-	public static ClusterContext createContext() throws IllegalStateException {
-		if (!isConnected()) {
-			throw new IllegalStateException("The node is not connected yet");
-		}
-		return new ClusterContext(hazelcastInstance, properties);
-	}
-
-	/**
 	 * Creates native HazelcastInstance instance.
 	 * 
 	 * @param host
@@ -150,7 +135,7 @@ public final class Instance {
 		userProperties.setProperty(PASSWORD, groupPassword);
 
 		try {
-			Instance.init(NodeType.NATIVE, userProperties);
+			Instance.init(NodeType.LITE, userProperties);
 			return getInstance();
 		} catch (ServiceException e) {
 			throw new RuntimeException("Cannot initialize client connection");
@@ -221,7 +206,7 @@ public final class Instance {
 		switch (type) {
 			case DATA:
 				return createDataInstance(userProperties);
-			case NATIVE:
+			case LITE:
 				return createNativeInstance(userProperties);
 			default:
 				throw new UnsupportedOperationException(nodeType.toString() + " unknown mode!");

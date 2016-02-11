@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.been.manager;
 
+import com.hazelcast.core.MemberAttributeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ final class MembershipListener extends TaskManagerService implements com.hazelca
 
 	private ClusterContext clusterCtx;
 	private IMessageSender sender;
+	private String listenerId;
 
 	/**
 	 * Creates MembershipListener.
@@ -34,12 +36,12 @@ final class MembershipListener extends TaskManagerService implements com.hazelca
 	@Override
 	public void start() throws ServiceException {
 		sender = createSender();
-		clusterCtx.getCluster().addMembershipListener(this);
+		this.listenerId = clusterCtx.getCluster().addMembershipListener(this);
 	}
 
 	@Override
 	public void stop() {
-		clusterCtx.getCluster().removeMembershipListener(this);
+		clusterCtx.getCluster().removeMembershipListener(this.listenerId);
 		sender.close();
 	}
 
@@ -51,6 +53,11 @@ final class MembershipListener extends TaskManagerService implements com.hazelca
 	@Override
 	public void memberRemoved(MembershipEvent membershipEvent) {
 		log.info("Member removed: {}", membershipEvent.getMember());
+	}
+
+	@Override
+	public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
+
 	}
 
 }

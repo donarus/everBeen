@@ -3,7 +3,10 @@ package cz.cuni.mff.d3s.been.manager;
 import static cz.cuni.mff.d3s.been.core.task.TaskState.WAITING;
 
 import java.util.Collection;
+import java.util.Properties;
 
+import com.hazelcast.core.MapEvent;
+import cz.cuni.mff.d3s.been.cluster.context.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,6 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.SqlPredicate;
 
 import cz.cuni.mff.d3s.been.cluster.ServiceException;
-import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.core.task.TaskEntries;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
 import cz.cuni.mff.d3s.been.core.task.TaskState;
@@ -40,28 +42,34 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 	/** task map */
 	private IMap<String, TaskEntry> taskMap;
 
-	/** Connection to the cluster */
-	private ClusterContext clusterCtx;
+	private TaskContexts taskContexts;
+	private final Benchmarks benchmarks;
+	private final Tasks tasks;
+	private Runtimes runtimes;
+	private Topics topics;
+	private Properties properties;
 
 	/** sender of "in-task manager" messages */
 	private IMessageSender<TaskMessage> sender;
 
-	/**
-	 * Creates LocalTaskListener
-	 * 
-	 * @param clusterCtx
-	 *          connection to the cluster.
-	 */
-	public LocalTaskListener(ClusterContext clusterCtx) {
-		this.clusterCtx = clusterCtx;
-		taskMap = clusterCtx.getTasks().getTasksMap();
-		MapConfig cfg = clusterCtx.getTasks().getTasksMapConfig();
+	private String listenerId;
+
+	public LocalTaskListener(TaskContexts taskContexts, Benchmarks benchmarks, Tasks tasks, Runtimes runtimes,
+							 Topics topics, Properties properties) {
+		this.taskContexts = taskContexts;
+		this.benchmarks = benchmarks;
+		this.tasks = tasks;
+		this.runtimes = runtimes;
+		this.topics = topics;
+		this.properties = properties;
+		taskMap = tasks.getTasksMap();
+		MapConfig cfg = tasks.getTasksMapConfig();
 
 		if (cfg == null) {
 			throw new RuntimeException("BEEN_MAP_TASKS! does not have a config!");
 		}
-		if (cfg.isCacheValue()) {
-			throw new RuntimeException("Cache value == true for BEEN_MAP_TASKS!");
+		if (cfg.isNearCacheEnabled()) {
+			log.warn("FIXME: throw new RuntimeException(\"Near cache is enabled for BEEN_MAP_TASKS!\");");
 		}
 
 	}
@@ -70,12 +78,12 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 	public void start() throws ServiceException {
 		sender = createSender();
 
-		taskMap.addLocalEntryListener(this);
+		this.listenerId = taskMap.addLocalEntryListener(this);
 	}
 
 	@Override
 	public void stop() {
-		taskMap.removeEntryListener(this);
+		taskMap.removeEntryListener(this.listenerId);
 		sender.close();
 	}
 
@@ -89,11 +97,11 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 			String dep = entry.getTaskDependency();
 
 			TaskEntries.setState(entry, WAITING, "Waiting for task %s to finish", dep);
-			clusterCtx.getTasks().putTask(entry);
+			tasks.putTask(entry);
 			return;
 		}
 		try {
-			TaskMessage msg = Messages.createNewTaskMessage(entry);
+			TaskMessage msg = Messages.createNewTaskMessage(entry, tasks, runtimes, topics);
 			sender.send(msg);
 		} catch (MessagingException e) {
 			String msg = String.format("Cannot send message to '%s'", sender.getConnection());
@@ -117,7 +125,7 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 		if (state == TaskState.WAITING) {
 
 			try {
-				TaskMessage msg = Messages.createCheckSchedulabilityMessage(entry);
+				TaskMessage msg = Messages.createCheckSchedulabilityMessage(entry, tasks, runtimes, topics);
 
 				sender.send(msg);
 			} catch (MessagingException e) {
@@ -134,7 +142,7 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 		}
 
 		try {
-			TaskMessage msg = Messages.createTaskChangedMessage(entry);
+			TaskMessage msg = Messages.createTaskChangedMessage(entry, taskContexts, benchmarks, tasks, runtimes, topics, properties);
 			sender.send(msg);
 		} catch (MessagingException e) {
 			String msg = String.format("Cannot send message to '%s'", sender.getConnection());
@@ -162,11 +170,21 @@ final class LocalTaskListener extends TaskManagerService implements EntryListene
 		try {
 			Collection<TaskEntry> entries = taskMap.values(predicate);
 			for (TaskEntry e : entries) {
-				sender.send(Messages.createScheduleTaskMessage(e));
+				sender.send(Messages.createScheduleTaskMessage(e, tasks, runtimes, topics));
 			}
 		} catch (Exception e) {
 			log.error("Cannot schedule a waiting task", e);
 		}
+
+	}
+
+	@Override
+	public void mapCleared(MapEvent event) {
+
+	}
+
+	@Override
+	public void mapEvicted(MapEvent event) {
 
 	}
 }

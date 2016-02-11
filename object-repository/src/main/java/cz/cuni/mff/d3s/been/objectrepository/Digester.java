@@ -8,8 +8,6 @@ import cz.cuni.mff.d3s.been.persistence.SuccessAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.cuni.mff.d3s.been.cluster.Reapable;
-import cz.cuni.mff.d3s.been.cluster.Reaper;
 import cz.cuni.mff.d3s.been.cluster.Service;
 
 /**
@@ -17,7 +15,7 @@ import cz.cuni.mff.d3s.been.cluster.Service;
  *
  * @param <T> Type of digested items
  */
-public class Digester<T> implements Service, Reapable {
+public class Digester<T> implements Service {
 
 	private static final long POOL_SHUTDOWN_TIMEOUT_MILLIS = 3000;
 	private static final Logger log = LoggerFactory.getLogger(Digester.class);
@@ -82,16 +80,6 @@ public class Digester<T> implements Service, Reapable {
 		} catch (InterruptedException e) {
 			log.error("Queue worker pool forced to terminate. Results may have been lost.");
 		}
-	}
-
-	@Override
-	public Reaper createReaper() {
-		return new Reaper() {
-			@Override
-			protected void reap() throws InterruptedException {
-				Digester.this.stop();
-			}
-		};
 	}
 
 }

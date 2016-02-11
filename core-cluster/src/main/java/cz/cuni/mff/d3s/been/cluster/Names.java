@@ -75,7 +75,7 @@ public class Names {
 	/**
 	 * Name of the queue of persist requests
 	 */
-	public static final String PERSISTENCE_QUEUE_NAME = "BEEN_PERSISTENCE_ENTRIES";
+	public static final String PERSISTENCE_QUEUE_NAME = "been.persistence.entries";
 
 	/**
 	 * Name of the queue of queries to persistence layers

@@ -4,10 +4,13 @@ import static cz.cuni.mff.d3s.been.manager.TaskManagerConfiguration.DEFAULT_MAXI
 import static cz.cuni.mff.d3s.been.manager.TaskManagerConfiguration.MAXIMUM_ALLOWED_RESUBMITS;
 
 import java.util.List;
+import java.util.Properties;
 
 import com.hazelcast.core.IMap;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
+import cz.cuni.mff.d3s.been.cluster.context.Tasks;
 import cz.cuni.mff.d3s.been.core.benchmark.BenchmarkEntry;
 import cz.cuni.mff.d3s.been.core.benchmark.ResubmitHistoryItem;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
@@ -18,32 +21,34 @@ import cz.cuni.mff.d3s.been.util.PropertyReader;
  * @author Kuba Brecka
  */
 final class ResubmitBenchmarkAction implements TaskAction {
-	private final ClusterContext ctx;
 	private final TaskEntry entry;
+	private final Benchmarks benchmarks;
+	private final Tasks tasks;
+	private Properties properties;
 
 	/**
 	 * Creates ResubmitBenchmarkAction.
-	 * 
-	 * @param ctx
-	 *          connection to the cluster
+	 *
 	 * @param entry
 	 *          targeted task entry
 	 */
-	public ResubmitBenchmarkAction(ClusterContext ctx, TaskEntry entry) {
-		this.ctx = ctx;
+	public ResubmitBenchmarkAction(TaskEntry entry, Benchmarks benchmarks, Tasks tasks, Properties properties) {
 		this.entry = entry;
+		this.benchmarks = benchmarks;
+		this.tasks = tasks;
+		this.properties = properties;
 	}
 
 	@Override
 	public void execute() throws TaskActionException {
 		String benchmarkId = entry.getBenchmarkId();
-		IMap<String, BenchmarkEntry> benchmarksMap = ctx.getBenchmarks().getBenchmarksMap();
+		IMap<String, BenchmarkEntry> benchmarksMap = benchmarks.getBenchmarksMap();
 
 		benchmarksMap.lock(benchmarkId);
 		try {
-			BenchmarkEntry benchmarkEntry = ctx.getBenchmarks().get(benchmarkId);
+			BenchmarkEntry benchmarkEntry = benchmarks.get(benchmarkId);
 			String generatorId = benchmarkEntry.getGeneratorId();
-			TaskEntry generatorTask = ctx.getTasks().getTask(generatorId);
+			TaskEntry generatorTask = tasks.getTask(generatorId);
 
 			if (!benchmarkEntry.isAllowResubmit()) {
 				return;
@@ -51,7 +56,7 @@ final class ResubmitBenchmarkAction implements TaskAction {
 
 			List<ResubmitHistoryItem> resubmits = benchmarkEntry.getResubmitHistory().getResubmitHistoryItem();
 
-			PropertyReader propertyReader = PropertyReader.on(ctx.getProperties());
+			PropertyReader propertyReader = PropertyReader.on(properties);
 			int maximumResubmits = propertyReader.getInteger(MAXIMUM_ALLOWED_RESUBMITS, DEFAULT_MAXIMUM_ALLOWED_RESUBMITS);
 			if (resubmits.size() >= maximumResubmits) {
 				return;
@@ -62,7 +67,7 @@ final class ResubmitBenchmarkAction implements TaskAction {
 				return;
 			}
 
-			ctx.getBenchmarks().resubmit(benchmarkEntry);
+			benchmarks.resubmit(benchmarkEntry);
 		} finally {
 			benchmarksMap.unlock(benchmarkId);
 		}

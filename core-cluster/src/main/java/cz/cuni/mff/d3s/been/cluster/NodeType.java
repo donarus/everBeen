@@ -18,21 +18,7 @@ public enum NodeType {
 	DATA,
 
 	/**
-	 * The node is a member of a cluster, but does not participate in data distribution.
-	 *
-	 * Such a node does not "own" any data, but incurs the overhead of membership handling.
-	 *
-	 * TODO: currenly there is not clear use case for such a node
+	 * The node is member of a cluster but dows not owns any data partition.
 	 */
-	LITE,
-
-	/**
-	 * The node is a client of a cluster.
-	 *
-	 * The node is not member of a cluster. There is no auto discovery so a cluster member
-	 * (or list of members) must be supplied to such a node to connect to.
-	 *
-	 * Host Runtimes can be implemented as native clients.
-	 */
-	NATIVE
+	LITE
 }

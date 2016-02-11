@@ -49,7 +49,7 @@ import cz.cuni.mff.d3s.been.util.JsonException;
 /**
  * The implementation of the {@link BeenApi} interface. To instantiate this
  * class, use {@link BeenApiFactory}.
- * 
+ *
  * @author donarus
  */
 final class BeenApiImpl implements BeenApi {
@@ -67,7 +67,7 @@ final class BeenApiImpl implements BeenApi {
 	 * Default constructor, which connects to the BEEN cluster as a native
 	 * Hazelcast client using the specified connection credentials. There must
 	 * already be some running BEEN node in full mode.
-	 * 
+	 *
 	 * @param host
 	 *          IP address or hostname of a running node
 	 * @param port
@@ -86,7 +86,7 @@ final class BeenApiImpl implements BeenApi {
 	 * {@link BeenApiImpl} constructor that reuses an already existing
 	 * {@link ClusterContext} instance. The passed cluster context must be already
 	 * connected to the BEEN cluster.
-	 * 
+	 *
 	 * @param clusterContext
 	 *          the cluster context to reuse
 	 */
@@ -466,18 +466,6 @@ final class BeenApiImpl implements BeenApi {
 	}
 
 	@Override
-	public void removeLogListener(final EntryListener<String, String> listener) throws BeenApiException {
-		final String errorMsg = "Failed to remove task log listener";
-		checkIsActive(errorMsg);
-
-		try {
-			clusterContext.<String, String> getMap(Names.LOGS_TASK_MAP_NAME).removeEntryListener(listener);
-		} catch (Exception e) {
-			throw createBeenApiException(errorMsg, e);
-		}
-	}
-
-	@Override
 	public Collection<TaskLogMessage> getLogsForTask(final String taskId) throws BeenApiException {
 		final String errorMsg = String.format("Failed to list logs for task with id '%s'", taskId);
 		final Query query = new QueryBuilder().on(Entities.LOG_TASK.getId()).with("taskId", taskId).fetch();
@@ -829,7 +817,7 @@ final class BeenApiImpl implements BeenApi {
 			final BlockingQueue<CommandEntry> queue = new LinkedBlockingQueue<>();
 			final EntryListener<Long, CommandEntry> waiter = new CommandEntryMapWaiter(queue);
 
-			map.addEntryListener(waiter, operationId, true);
+			String listenerId = map.addEntryListener(waiter, operationId, true);
 
 			CommandEntry commandEntry = map.get(operationId);
 
@@ -841,7 +829,7 @@ final class BeenApiImpl implements BeenApi {
 				}
 			}
 
-			map.removeEntryListener(waiter);
+			map.removeEntryListener(listenerId);
 			queue.clear();
 
 			if (commandEntry == null) {
@@ -959,7 +947,7 @@ final class BeenApiImpl implements BeenApi {
 	 * Performs a general query (e.g. fetch, delete, ...) in the persistence layer
 	 * and returns a {@link QueryAnswer} object that represent the query result
 	 * and the returned data (if there are any).
-	 * 
+	 *
 	 * @param query
 	 *          the query to execute
 	 * @return the query answer
@@ -1023,7 +1011,7 @@ final class BeenApiImpl implements BeenApi {
 	 * Performs a general Hazelcast predicate query on the specified map. This
 	 * evaluates the predicate in a distributed manner and returns the map entries
 	 * that matched the query (for which the predicate returned true).
-	 * 
+	 *
 	 * @param mapName
 	 *          the name of the map to query
 	 * @param queryPredicate
@@ -1110,7 +1098,7 @@ final class BeenApiImpl implements BeenApi {
 	 * If yes, this method simply returns, if no, it throws a
 	 * {@link ClusterConnectionUnavailableException} exception with the specified
 	 * exception message.
-	 * 
+	 *
 	 * @param format
 	 *          the format of the exception message
 	 * @param args
@@ -1305,7 +1293,7 @@ final class BeenApiImpl implements BeenApi {
 	 * wrong Call this on a {@link QueryAnswer} that should be bringing you data.
 	 * Provide the {@link Query} this answer originated from. If the answer is not
 	 * carrying the data it should, an informative exception is thrown.
-	 * 
+	 *
 	 * @param query
 	 *          {@link Query} you used to retrieve data. This method should only
 	 *          be using for fetch-type queries
@@ -1336,7 +1324,7 @@ final class BeenApiImpl implements BeenApi {
 
 	/**
 	 * Perform given query operation
-	 * 
+	 *
 	 * @param query
 	 *          query to be performed
 	 * @param errorMsg
@@ -1374,7 +1362,7 @@ final class BeenApiImpl implements BeenApi {
 	 * Creates and returns an instance of {@link SwRepoClient} that serves as a
 	 * client for the software repository. The repository must be running, or else
 	 * a {@link BeenApiException} is thrown with the specified message.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          the message of the exception
 	 * @return a client for the software repository
@@ -1407,7 +1395,7 @@ final class BeenApiImpl implements BeenApi {
 
 	/**
 	 * Creates a persistence exception with the specified message and cause.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          message of the exception
 	 * @param cause
@@ -1421,7 +1409,7 @@ final class BeenApiImpl implements BeenApi {
 
 	/**
 	 * Creates a persistence exception with the specified message and reason.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          message of the exception
 	 * @param reason
@@ -1436,7 +1424,7 @@ final class BeenApiImpl implements BeenApi {
 	/**
 	 * Creates an exception which signals that the software repository is
 	 * unavailable.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          message of the exception
 	 * @return a new exception object
@@ -1448,7 +1436,7 @@ final class BeenApiImpl implements BeenApi {
 
 	/**
 	 * Creates a general BEEN exception with the specified message and cause.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          message of the exception
 	 * @param e
@@ -1461,7 +1449,7 @@ final class BeenApiImpl implements BeenApi {
 
 	/**
 	 * Creates a persistence exception with the specified message and reason.
-	 * 
+	 *
 	 * @param errorMsg
 	 *          message of the exception
 	 * @param reason
@@ -1475,7 +1463,7 @@ final class BeenApiImpl implements BeenApi {
 	/**
 	 * Creates a string representation of the BPK identifier and name of a
 	 * descriptor.
-	 * 
+	 *
 	 * @param bpkId
 	 *          BPK identifier
 	 * @param name

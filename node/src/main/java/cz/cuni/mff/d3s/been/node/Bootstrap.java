@@ -1,16 +1,16 @@
 package cz.cuni.mff.d3s.been.node;
 
 import cz.cuni.mff.d3s.been.BeenServiceConfiguration;
-import cz.cuni.mff.d3s.been.cluster.NodeType;
+import cz.cuni.mff.d3s.been.commons.NodeType;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
+import org.springframework.context.support.GenericApplicationContext;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -20,49 +20,35 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 
 import static cz.cuni.mff.d3s.been.core.StatusCode.EX_OK;
 import static cz.cuni.mff.d3s.been.core.StatusCode.EX_USAGE;
 
-/**
- * EverBEEN application entry point
- */
 public class Bootstrap {
 
-    // ------------------------------------------------------------------------
-    // LOGGING
-    // ------------------------------------------------------------------------
+    private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
 
-    private static final Logger log = LoggerFactory.getLogger(Runner.class);
-
-    // ------------------------------------------------------------------------
-    // COMMAND LINE ARGUMENTS
-    // ------------------------------------------------------------------------
-
-    @Option(name = "-t", aliases = { "--node-type" }, usage = "Type of the node. DEFAULT is DATA")
+    @Option(name = "-t", aliases = {"--node-type"}, usage = "Type of the node. DEFAULT is DATA")
     private NodeType nodeType = NodeType.DATA;
 
-    @Option(name = "-cf", aliases = { "--config-file" }, usage = "Path or URL to BEEN config file.")
+    @Option(name = "-s", aliases = {"--services"}, usage = "Services to be started. Empty by default.", handler = StringArrayOptionHandler.class)
+    private String[] requiredServices = new String[0];
+
+    @Option(name = "-cf", aliases = {"--config-file"}, usage = "Path or URL to BEEN config file.")
     private String configFile;
 
-    @Option(name = "-dc", aliases = { "--dump-config" }, usage = "Whether to print runtime configuration and exit")
+    @Option(name = "-dc", aliases = {"--dump-config"}, usage = "Whether to print runtime configuration and exit")
     private boolean dumpConfig;
 
-    @Option(name = "-r", aliases = { "--host-runtime" }, usage = "Whether to run Host runtime on this node")
-    private boolean runHostRuntime = false;
-
-    @Option(name = "-sw", aliases = { "--software-repository" }, usage = "Whether to run Software Repository on this node.")
-    private boolean runSWRepository = false;
-
-    @Option(name = "-rr", aliases = { "--repository" }, usage = "Whether to run Repository on this node. Requires a running matching persistence layer.")
-    private boolean runRepository = false;
-
-    @Option(name = "-h", aliases = { "--help" }, usage = "Prints help")
+    @Option(name = "-h", aliases = {"--help"}, usage = "Prints help")
     private boolean printHelp = false;
 
     public static void main(String[] args) {
-        String[] testArgs = new String[] {"--host-runtime"};
+        String[] testArgs = new String[]{"-s", "host-runtime"};
         new Bootstrap().bootstrap(testArgs);
     }
 
@@ -81,27 +67,26 @@ public class Bootstrap {
             EX_USAGE.sysExit();
         }
 
-        List<String> profiles = new ArrayList<>();
-        if(runHostRuntime) {
-            profiles.add("host-runtime");
-        }
-        if(runSWRepository) {
-            profiles.add("software-repository");
-        }
-        if(runRepository) {
-            profiles.add("results-repository");
-        }
+        ClassPathXmlApplicationContext context = startApplicationContext(properties);
 
-        StartupConfigurationHolder.setProperties(properties);
-        StartupConfigurationHolder.setNodeType(nodeType);
+        Been been = context.getBean(Been.class);
+        been.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> been.stop()));
+    }
+
+    private ClassPathXmlApplicationContext startApplicationContext(Properties properties) {
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        beanFactory.registerSingleton("nodeType", nodeType);
+        beanFactory.registerSingleton("properties", properties);
+        GenericApplicationContext existingBeansContext = new GenericApplicationContext(beanFactory);
+        existingBeansContext.refresh();
 
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-        context.setConfigLocation("*context.xml");
-        context.getEnvironment().setActiveProfiles(profiles.toArray(new String[profiles.size()]));
+        context.setConfigLocation("base-been-context.xml");
+        context.setParent(existingBeansContext);
+        context.getEnvironment().setActiveProfiles(requiredServices);
         context.refresh();
-
-        context.getBean(Been.class).start();
-
+        return context;
     }
 
     /**
@@ -110,8 +95,7 @@ public class Bootstrap {
      * In case of error, an error message and usage is print to System.err, then
      * program quits.
      *
-     * @param args
-     *          Command line arguments
+     * @param args Command line arguments
      */
     private void parseCmdLineArguments(final String[] args) {
         // Handle command-line arguments
@@ -186,8 +170,7 @@ public class Bootstrap {
     /**
      * Prints runtime configuration of BEEN.
      *
-     * @param properties
-     *          user specified properties
+     * @param properties user specified properties
      */
     private void printBeenConfiguration(final Properties properties) {
 

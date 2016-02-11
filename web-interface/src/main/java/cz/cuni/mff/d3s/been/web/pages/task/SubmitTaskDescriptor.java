@@ -158,10 +158,10 @@ public class SubmitTaskDescriptor extends Page {
 	Object onActivate(String groupId, String bpkId, String version, String descriptorName) throws BeenApiException {
 		// load correct task descriptor
 		BpkIdentifier bpkIdentifier = new BpkIdentifier().withGroupId(groupId).withBpkId(bpkId).withVersion(version);
-		this.taskDescriptor = getApi().getTaskDescriptor(bpkIdentifier, descriptorName);
+		this.taskDescriptor = getBeenApi().getTaskDescriptor(bpkIdentifier, descriptorName);
 
 		if (this.taskDescriptor == null) {
-			this.taskDescriptor = getApi().getNamedTaskDescriptorsForBpk(bpkIdentifier).get(descriptorName);
+			this.taskDescriptor = getBeenApi().getNamedTaskDescriptorsForBpk(bpkIdentifier).get(descriptorName);
 		}
 
 		args = new ArrayList<>();
@@ -231,17 +231,17 @@ public class SubmitTaskDescriptor extends Page {
 	private void saveTaskDescriptor(TaskDescriptor taskDescriptor, String saveName) throws BeenApiException {
 		BpkIdentifier bpkIdentifier = new BpkIdentifier().withGroupId(taskDescriptor.getGroupId()).withBpkId(
                 taskDescriptor.getBpkId()).withVersion(taskDescriptor.getVersion());
-		getApi().saveNamedTaskDescriptor(taskDescriptor, saveName, bpkIdentifier);
+		getBeenApi().saveNamedTaskDescriptor(taskDescriptor, saveName, bpkIdentifier);
 	}
 
 	protected void submitTaskDescriptor(TaskDescriptor taskDescriptor) throws BeenApiException {
 		// try to execute the filter to see if it is syntactically correct
 		String xpath = taskDescriptor.getHostRuntimes().getXpath();
 		if (xpath != null && !xpath.isEmpty()) {
-			getApi().getRuntimes(taskDescriptor.getHostRuntimes().getXpath());
+			getBeenApi().getRuntimes(taskDescriptor.getHostRuntimes().getXpath());
 		}
 
-		getApi().submitTask(taskDescriptor);
+		getBeenApi().submitTask(taskDescriptor);
 	}
 
 }

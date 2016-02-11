@@ -15,7 +15,7 @@ import java.util.Properties;
  * 
  * @author Martin Sixta
  */
-abstract class PropertyLoader {
+public abstract class PropertyLoader {
 
 	/**
 	 * Loads {@link Properties} from an external resource.
@@ -24,7 +24,7 @@ abstract class PropertyLoader {
 	 * @throws IOException
 	 *           when the resource cannot be loaded
 	 */
-	abstract Properties load() throws IOException;
+	public abstract Properties load() throws IOException;
 
 	/**
 	 * Creates {@link PropertyLoader} for an {@link URL} resource
@@ -33,7 +33,7 @@ abstract class PropertyLoader {
 	 *          URL location of the resource
 	 * @return loader bind to the <code>url</code>
 	 */
-	static PropertyLoader fromUrl(URL url) {
+	public static PropertyLoader fromUrl(URL url) {
 		return new UrlPropertyReader(url);
 	}
 
@@ -44,7 +44,7 @@ abstract class PropertyLoader {
 	 *          location of the resource
 	 * @return loader bind to the <code>path</code>
 	 */
-	static PropertyLoader fromPath(Path path) {
+	public static PropertyLoader fromPath(Path path) {
 		return new PathPropertyLoader(path);
 	}
 
@@ -60,7 +60,7 @@ abstract class PropertyLoader {
 		}
 
 		@Override
-		Properties load() throws IOException {
+		public Properties load() throws IOException {
 			Properties properties = new Properties();
 
 			try (final BufferedReader in = Files.newBufferedReader(path, Charset.defaultCharset())) {
@@ -84,7 +84,7 @@ abstract class PropertyLoader {
 		}
 
 		@Override
-		Properties load() throws IOException {
+		public Properties load() throws IOException {
 			Properties properties = new Properties();
 
 			try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {

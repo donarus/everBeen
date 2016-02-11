@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.concurrent.lock.LockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -260,26 +261,21 @@ public class MongoMapStore implements MapStore, MapLoaderLifecycleSupport {
 
 	private synchronized void resolveFailedObjects() {
 		IMap failedStoreMap = getFailedStoreMap();
-
-		if (failedStoreMap.size() > 0 && failedStoreMap.lockMap(5, TimeUnit.SECONDS)) {
-			try {
-				for (Object failedKey : failedStoreMap.keySet()) {
-					Object failedValue = failedStoreMap.get(failedKey);
-					if (failedValue == null) {
-						if (deletePersistent(failedKey)) {
-							break;
-						}
-						failedStoreMap.remove(failedKey);
-					} else {
-						if (storePersistent(failedKey, failedValue)) {
-							break;
-						}
-						failedStoreMap.remove(failedKey);
-					}
+		for (Object failedKey : failedStoreMap.keySet()) {
+			failedStoreMap.lock(failedKey, 5, TimeUnit.SECONDS);
+			Object failedValue = failedStoreMap.get(failedKey);
+			if (failedValue == null) {
+				if (deletePersistent(failedKey)) {
+					break;
 				}
-			} finally {
-				failedStoreMap.unlockMap();
+				failedStoreMap.remove(failedKey);
+			} else {
+				if (storePersistent(failedKey, failedValue)) {
+					break;
+				}
+				failedStoreMap.remove(failedKey);
 			}
+			failedStoreMap.unlock(failedKey);
 		}
 	}
 

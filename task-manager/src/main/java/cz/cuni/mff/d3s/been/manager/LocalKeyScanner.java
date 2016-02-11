@@ -4,9 +4,13 @@ import static cz.cuni.mff.d3s.been.core.task.TaskState.*;
 import static cz.cuni.mff.d3s.been.manager.TaskManagerConfiguration.*;
 
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import cz.cuni.mff.d3s.been.cluster.context.Runtimes;
+import cz.cuni.mff.d3s.been.cluster.context.Tasks;
+import cz.cuni.mff.d3s.been.cluster.context.Topics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,9 @@ final class LocalKeyScanner extends TaskManagerService {
 
 	/** Connection to the cluster */
 	private final ClusterContext clusterCtx;
+	private Tasks tasks;
+	private Runtimes runtimes;
+	private Topics topics;
 
 	/** Task Action Queue */
 	private IMessageSender<TaskMessage> sender;
@@ -46,8 +53,6 @@ final class LocalKeyScanner extends TaskManagerService {
 	/** The scanner runnable */
 	private final LocalKeyScannerRunnable runnable;
 
-	/** This node's ID */
-	private final String nodeId;
 
 	private final PropertyReader propertyReader;
 
@@ -57,11 +62,13 @@ final class LocalKeyScanner extends TaskManagerService {
 	 * @param clusterCtx
 	 *          connection to the cluster
 	 */
-	public LocalKeyScanner(ClusterContext clusterCtx) {
+	public LocalKeyScanner(ClusterContext clusterCtx, Tasks tasks, Runtimes runtimes, Topics topics, Properties properties) {
 		this.clusterCtx = clusterCtx;
-		this.nodeId = clusterCtx.getCluster().getLocalMember().getUuid();
+		this.tasks = tasks;
+		this.runtimes = runtimes;
+		this.topics = topics;
 		this.runnable = new LocalKeyScannerRunnable();
-		this.propertyReader = PropertyReader.on(clusterCtx.getProperties());
+		this.propertyReader = PropertyReader.on(properties);
 	}
 
 	/** Runnable to schedule with the executor */
@@ -86,10 +93,10 @@ final class LocalKeyScanner extends TaskManagerService {
 	 *           when it rains
 	 */
 	private void doRun() throws Exception {
-		IMap<String, TaskEntry> map = clusterCtx.getTasks().getTasksMap();
+		IMap<String, TaskEntry> map = tasks.getTasksMap();
 
 		Set<String> runtimeIds = new HashSet<>();
-		for (RuntimeInfo info : clusterCtx.getRuntimes().getRuntimes()) {
+		for (RuntimeInfo info : runtimes.getRuntimes()) {
 			runtimeIds.add(info.getId());
 		}
 
@@ -136,7 +143,7 @@ final class LocalKeyScanner extends TaskManagerService {
 			String logMsg = String.format("Will abort task '%s' because of cluster restart", entry.getId());
 			log.debug(logMsg);
 
-			sender.send(Messages.createAbortTaskMessage(entry, logMsg));
+			sender.send(Messages.createAbortTaskMessage(tasks, entry, logMsg));
 			return;
 		}
 
@@ -145,7 +152,7 @@ final class LocalKeyScanner extends TaskManagerService {
 			String logMsg = String.format("Will reschedule '%s' because of Host Runtime failure", entry.getId());
 			log.debug(logMsg);
 
-			sender.send(Messages.createRescheduleTaskMessage(entry));
+			sender.send(Messages.createRescheduleTaskMessage(entry, tasks, runtimes, topics));
 			return;
 		}
 
@@ -154,13 +161,13 @@ final class LocalKeyScanner extends TaskManagerService {
 			String logMsg = String.format("Will abort '%s' because of Host Runtime failure", entry.getId());
 			log.debug(logMsg);
 
-			sender.send(Messages.createAbortTaskMessage(entry, logMsg));
+			sender.send(Messages.createAbortTaskMessage(tasks, entry, logMsg));
 			return;
 		}
 
 		if (isWaiting) {
 			log.debug("Will try to schedule WAITING task {}", entry.getState());
-			TaskMessage msg = Messages.createCheckSchedulabilityMessage(entry);
+			TaskMessage msg = Messages.createCheckSchedulabilityMessage(entry,tasks, runtimes, topics);
 			sender.send(msg);
 			return;
 		}

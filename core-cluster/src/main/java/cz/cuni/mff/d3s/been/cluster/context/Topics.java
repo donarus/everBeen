@@ -1,30 +1,23 @@
 package cz.cuni.mff.d3s.been.cluster.context;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.MessageListener;
 import cz.cuni.mff.d3s.been.cluster.Names;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for topics-related handling.
  * 
  * @author Martin Sixta
  */
+@Component
 public class Topics {
 
 	/** BEEN cluster connection */
-	private ClusterContext clusterCtx;
-
-	/**
-	 * Package private constructor, creates a new instance that uses the specified
-	 * BEEN cluster context.
-	 * 
-	 * @param clusterCtx
-	 *          the cluster context to use
-	 */
-	Topics(ClusterContext clusterCtx) {
-		// package private visibility prevents out-of-package instantiation	
-		this.clusterCtx = clusterCtx;
-	}
+	@Autowired
+	private HazelcastInstance hazelcastInstance;
 
 	/**
 	 * Returns a Hazelcast topic with the specified name. If such a topic does not
@@ -37,7 +30,7 @@ public class Topics {
 	 * @return the topic with the specified name
 	 */
 	public <E> ITopic<E> getTopic(String name) {
-		return clusterCtx.getTopic(name);
+		return hazelcastInstance.getTopic(name);
 	}
 
 	/**

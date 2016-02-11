@@ -4,6 +4,7 @@ import java.io.StringWriter;
 
 import javax.xml.bind.JAXBException;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
 import org.xml.sax.SAXException;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
@@ -24,9 +25,8 @@ public class ResubmitHistoryRetrieve implements Action {
 
 	/** the request to handle */
 	private final CheckpointRequest request;
+	private Benchmarks benchmarks;
 
-	/** BEEN cluster instance */
-	private final ClusterContext ctx;
 
 	/**
 	 * Default constructor, creates the action with the specified request and
@@ -34,18 +34,16 @@ public class ResubmitHistoryRetrieve implements Action {
 	 * 
 	 * @param request
 	 *          the request to handle
-	 * @param ctx
-	 *          the cluster context
 	 */
-	public ResubmitHistoryRetrieve(CheckpointRequest request, ClusterContext ctx) {
+	public ResubmitHistoryRetrieve(CheckpointRequest request, Benchmarks benchmarks) {
 		this.request = request;
-		this.ctx = ctx;
+		this.benchmarks = benchmarks;
 	}
 
 	@Override
 	public Reply handle() {
 		String benchmarkId = this.request.getSelector();
-		ResubmitHistory history = ctx.getBenchmarks().get(benchmarkId).getResubmitHistory();
+		ResubmitHistory history = benchmarks.get(benchmarkId).getResubmitHistory();
 		String s = resubmitHistoryToXml(history);
 		return Replies.createOkReply(s);
 	}

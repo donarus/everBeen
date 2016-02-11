@@ -19,6 +19,7 @@ final class ClientListener extends TaskManagerService implements com.hazelcast.c
 
 	private ClusterContext clusterCtx;
 	private IMessageSender sender;
+	private String listenerId;
 
 	/**
 	 * Creates ClientListener.
@@ -45,12 +46,12 @@ final class ClientListener extends TaskManagerService implements com.hazelcast.c
 	@Override
 	public void start() throws ServiceException {
 		sender = createSender();
-		clusterCtx.getClientService().addClientListener(this);
+		this.listenerId = clusterCtx.getClientService().addClientListener(this);
 	}
 
 	@Override
 	public void stop() {
-		clusterCtx.getClientService().removeClientListener(this);
+		clusterCtx.getClientService().removeClientListener(this.listenerId);
 		sender.close();
 	}
 

@@ -3,7 +3,10 @@ package cz.cuni.mff.d3s.been.manager;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Properties;
 
+import com.hazelcast.core.MapEvent;
+import cz.cuni.mff.d3s.been.cluster.context.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +16,6 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.SqlPredicate;
 
 import cz.cuni.mff.d3s.been.cluster.ServiceException;
-import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
 import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
 import cz.cuni.mff.d3s.been.core.task.TaskState;
@@ -35,30 +37,36 @@ final class LocalRuntimeListener extends TaskManagerService implements EntryList
 
 	/** logging */
 	private static final Logger log = LoggerFactory.getLogger(LocalRuntimeListener.class);
-
-	/** connection to the cluster */
-	private ClusterContext clusterCtx;
+	private final TaskContexts taskContexts;
+	private final Runtimes runtimes;
+	private Topics topics;
+	private Properties properties;
 
 	/** for sending task manager messages for processing */
 	private IMessageSender<TaskMessage> sender;
 
-	/** Map with Host Runtimes */
-	private final IMap<String, RuntimeInfo> runtimesMap;
 
 	/** Map with tasks */
 	private final IMap<String, TaskEntry> tasksMap;
 
+	private String listenerId;
+
+	private Benchmarks benchmarks;
+	private Tasks tasks;
+
 	/**
 	 * Creates LocalRuntimeListener.
-	 * 
-	 * @param clusterCtx
-	 *          connection to the cluster
+	 *
 	 */
-	public LocalRuntimeListener(ClusterContext clusterCtx) {
-
-		this.clusterCtx = clusterCtx;
-		this.runtimesMap = clusterCtx.getRuntimes().getRuntimeMap();
-		this.tasksMap = clusterCtx.getTasks().getTasksMap();
+	public LocalRuntimeListener(TaskContexts taskContexts, Runtimes runtimes, Tasks tasks, Benchmarks benchmarks,
+								Topics topics, Properties properties) {
+		this.benchmarks = benchmarks;
+		this.taskContexts = taskContexts;
+		this.runtimes = runtimes;
+		this.topics = topics;
+		this.properties = properties;
+		this.tasksMap = tasks.getTasksMap();
+		this.tasks = tasks;
 
 	}
 
@@ -101,9 +109,9 @@ final class LocalRuntimeListener extends TaskManagerService implements EntryList
 				TaskState state = entry.getState();
 
 				if (state == TaskState.RUNNING) {
-					sender.send(Messages.createAbortTaskMessage(entry, "Host Runtime Failed"));
+					sender.send(Messages.createAbortTaskMessage(this.tasks, entry, "Host Runtime Failed"));
 				} else if (state == TaskState.SCHEDULED) {
-					sender.send(Messages.createScheduleTaskMessage(entry));
+					sender.send(Messages.createScheduleTaskMessage(entry, this.tasks, runtimes, topics));
 				}
 			} catch (MessagingException e) {
 				String msg = String.format("Cannot send message to '%s'", sender.getConnection());
@@ -117,12 +125,12 @@ final class LocalRuntimeListener extends TaskManagerService implements EntryList
 	public void start() throws ServiceException {
 		sender = createSender();
 
-		runtimesMap.addLocalEntryListener(this);
+		this.listenerId = runtimes.getRuntimeMap().addLocalEntryListener(this);
 	}
 
 	@Override
 	public void stop() {
-		runtimesMap.removeEntryListener(this);
+		runtimes.getRuntimeMap().removeEntryListener(this.listenerId);
 		sender.close();
 	}
 
@@ -132,7 +140,7 @@ final class LocalRuntimeListener extends TaskManagerService implements EntryList
 	private void scheduleWaitingTasks() {
 		for (TaskEntry entry : getWaitingTasks()) {
 			try {
-				TaskMessage msg = Messages.createTaskChangedMessage(entry);
+				TaskMessage msg = Messages.createTaskChangedMessage(entry, taskContexts, benchmarks, tasks, runtimes, topics, properties);
 				sender.send(msg);
 			} catch (MessagingException e) {
 				String msg = String.format("Cannot send message to '%s'", sender.getConnection());
@@ -186,6 +194,16 @@ final class LocalRuntimeListener extends TaskManagerService implements EntryList
 		}
 
 		return Collections.emptyList();
+
+	}
+
+	@Override
+	public void mapCleared(MapEvent event) {
+
+	}
+
+	@Override
+	public void mapEvicted(MapEvent event) {
 
 	}
 }

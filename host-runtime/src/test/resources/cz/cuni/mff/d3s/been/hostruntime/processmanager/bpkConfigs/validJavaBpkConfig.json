@@ -1,0 +1,22 @@
+{
+  "type": "java",
+
+  "groupId": "cz.cuni.mff.d3s.been",
+  "bpkId": "task-example-helloworld",
+  "version": "1.0.0-SNAPSHOT",
+
+  "jarFile": "task-example-helloworld-1.0.0-SNAPSHOT.jar",
+
+  "artifacts": [
+    {
+      "groupId": "cz.cuni.mff.d3s.been",
+      "artifactId": "task-api",
+      "version": "3.0.0-SNAPSHOT"
+    },
+    {
+      "groupId": "cz.cuni.mff.d3s.been",
+      "artifactId": "persistence",
+      "version": "3.0.0-SNAPSHOT"
+    }
+  ]
+}

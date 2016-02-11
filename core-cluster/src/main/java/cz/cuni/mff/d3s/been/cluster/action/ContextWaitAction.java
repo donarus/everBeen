@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.MapEvent;
+import cz.cuni.mff.d3s.been.cluster.context.TaskContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,10 @@ public class ContextWaitAction implements Action {
 	/** the request to handle */
 	private final Request request;
 
-	/** BEEN cluster instance */
-	private final ClusterContext ctx;
-
 	/** a blocking queue which is used for the waiting operation */
 	BlockingQueue<TaskContextEntry> queue = new LinkedBlockingQueue<>();
+
+	private final TaskContexts taskContexts;
 
 	/**
 	 * Default constructor, creates the action with the specified request and
@@ -45,12 +45,12 @@ public class ContextWaitAction implements Action {
 	 * 
 	 * @param request
 	 *          the request to handle
-	 * @param ctx
+	 * @param taskContexts
 	 *          the cluster context
 	 */
-	public ContextWaitAction(Request request, ClusterContext ctx) {
+	public ContextWaitAction(Request request, TaskContexts taskContexts) {
 		this.request = request;
-		this.ctx = ctx;
+		this.taskContexts = taskContexts;
 	}
 
 	/**
@@ -95,11 +95,10 @@ public class ContextWaitAction implements Action {
 	public Reply handle() {
 		String key = request.getValue();
 
-		Reply reply = null;
 
 		final MapWaiter waiter = new MapWaiter();
 
-		IMap<String, TaskContextEntry> iMap = ctx.getTaskContexts().getTaskContextsMap();
+		IMap<String, TaskContextEntry> iMap = taskContexts.getTaskContextsMap();
 
 		String listenerId = iMap.addEntryListener(waiter, key, true);
 
@@ -123,6 +122,7 @@ public class ContextWaitAction implements Action {
 			}
 		}
 
+		Reply reply;
 		if (value == null) {
 			if (timeout) {
 				reply = Replies.createErrorReply("TIMEOUT");

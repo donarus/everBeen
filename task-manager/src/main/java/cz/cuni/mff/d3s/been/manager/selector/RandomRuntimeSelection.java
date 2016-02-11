@@ -6,11 +6,12 @@ import static cz.cuni.mff.d3s.been.core.task.TaskExclusivity.NON_EXCLUSIVE;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import com.hazelcast.core.MapEntry;
 import com.hazelcast.query.Predicate;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
+import cz.cuni.mff.d3s.been.cluster.context.Runtimes;
 import cz.cuni.mff.d3s.been.core.ri.RuntimeInfo;
 import cz.cuni.mff.d3s.been.core.ri.RuntimeInfos;
 import cz.cuni.mff.d3s.been.core.task.TaskEntry;
@@ -25,19 +26,17 @@ import cz.cuni.mff.d3s.been.core.task.TaskExclusivity;
  */
 final class RandomRuntimeSelection implements IRuntimeSelection {
 
-	private ClusterContext clusterCtx;
+	private Runtimes runtimes;
 	private final TaskEntry entry;
 
 	/**
 	 * Creates RandomRuntimeSelection.
-	 * 
-	 * @param clusterCtx
-	 *          connection to the cluster
+	 *
 	 * @param entry
 	 *          targeted task entry
 	 */
-	public RandomRuntimeSelection(final ClusterContext clusterCtx, final TaskEntry entry) {
-		this.clusterCtx = clusterCtx;
+	public RandomRuntimeSelection(final Runtimes runtimes, final TaskEntry entry) {
+		this.runtimes = runtimes;
 		this.entry = entry;
 	}
 
@@ -49,7 +48,7 @@ final class RandomRuntimeSelection implements IRuntimeSelection {
 
 		Predicate<?, ?> predicate = new ExclusivityPredicate(exclusivity, contextId);
 
-		List<RuntimeInfo> runtimes = new ArrayList<>(clusterCtx.getRuntimes().getRuntimeMap().values(predicate));
+		List<RuntimeInfo> runtimes = new ArrayList<>(this.runtimes.getRuntimeMap().values(predicate));
 
 		if (runtimes.size() == 0) {
 			throw new NoRuntimeFoundException("Cannot find suitable Host Runtime");
@@ -77,7 +76,7 @@ final class RandomRuntimeSelection implements IRuntimeSelection {
 		}
 
 		@Override
-		public boolean apply(MapEntry<String, RuntimeInfo> mapEntry) {
+		public boolean apply(Map.Entry<String, RuntimeInfo> mapEntry) {
 			RuntimeInfo info = mapEntry.getValue();
 
 			if (info.getExclusivity() == null) {

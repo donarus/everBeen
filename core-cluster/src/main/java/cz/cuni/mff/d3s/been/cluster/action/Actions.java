@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.been.cluster.action;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
+import cz.cuni.mff.d3s.been.cluster.context.TaskContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +28,7 @@ public class Actions {
 	 *          performed
 	 * @return the newly created action that will handle the request
 	 */
-	public static Action createAction(CheckpointRequest request, ClusterContext ctx) {
+	public static Action createAction(CheckpointRequest request, ClusterContext ctx, TaskContexts taskContexts, Benchmarks benchmarks) {
 
 		switch (request.getType()) {
 
@@ -45,17 +47,17 @@ public class Actions {
 			case LATCH_HAS_COUNT:
 				return new LatchHasCountAction(request, ctx);
 			case CONTEXT_SUBMIT:
-				return new ContextSubmitAction(request, ctx);
+				return new ContextSubmitAction(request, taskContexts, benchmarks);
 			case CONTEXT_WAIT:
-				return new ContextWaitAction(request, ctx);
+				return new ContextWaitAction(request, taskContexts);
 			case STORAGE_PERSIST:
-				return new StoragePersistAction(request, ctx);
+				return new StoragePersistAction(request, benchmarks);
 			case STORAGE_RETRIEVE:
-				return new StorageRetrieveAction(request, ctx);
+				return new StorageRetrieveAction(request, benchmarks);
 			case RESUBMIT_HISTORY_RETRIEVE:
-				return new ResubmitHistoryRetrieve(request, ctx);
+				return new ResubmitHistoryRetrieve(request, benchmarks);
 			case CONTAINED_CONTEXTS_RETRIEVE:
-				return new ContainedContextsRetrieve(request, ctx);
+				return new ContainedContextsRetrieve(request, benchmarks);
 			default:
 				String msg = String.format("No such action %s", request.getType());
 				log.warn(msg);

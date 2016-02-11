@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 
 import javax.xml.bind.JAXBException;
 
+import cz.cuni.mff.d3s.been.cluster.context.Benchmarks;
 import org.xml.sax.SAXException;
 
 import cz.cuni.mff.d3s.been.cluster.context.ClusterContext;
@@ -26,9 +27,7 @@ public class StoragePersistAction implements Action {
 
 	/** the request to handle */
 	private final Request request;
-
-	/** BEEN cluster instance */
-	private final ClusterContext ctx;
+	private Benchmarks benchmarks;
 
 	/**
 	 * Default constructor, creates the action with the specified request and
@@ -36,12 +35,10 @@ public class StoragePersistAction implements Action {
 	 * 
 	 * @param request
 	 *          the request to handle
-	 * @param ctx
-	 *          the cluster context
 	 */
-	public StoragePersistAction(Request request, ClusterContext ctx) {
+	public StoragePersistAction(Request request, Benchmarks benchmarks) {
 		this.request = request;
-		this.ctx = ctx;
+		this.benchmarks = benchmarks;
 	}
 
 	@Override
@@ -49,9 +46,9 @@ public class StoragePersistAction implements Action {
 		String benchmarkId = this.request.getSelector();
 		Storage storage = storageFromXml(this.request.getValue());
 
-		BenchmarkEntry entry = ctx.getBenchmarks().get(benchmarkId);
+		BenchmarkEntry entry = benchmarks.get(benchmarkId);
 		entry.setStorage(storage);
-		ctx.getBenchmarks().put(entry);
+		benchmarks.put(entry);
 
 		return Replies.createOkReply("");
 	}
