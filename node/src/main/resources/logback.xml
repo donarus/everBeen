@@ -8,9 +8,9 @@
 		</encoder>
 	</appender>
 
-	<appender name="CLUSTER" class="cz.cuni.mff.d3s.been.logging.BeenAppender">
-		<!-- encoder no applicable -->
-	</appender>
+	<!--<appender name="CLUSTER" class="cz.cuni.mff.d3s.been.logging.BeenAppender">-->
+		<!--&lt;!&ndash; encoder no applicable &ndash;&gt;-->
+	<!--</appender>-->
 
 
 	<!-- Too much logging on DEBUG, set it to WARN -->
@@ -25,7 +25,7 @@
 
 	<root level="INFO">
 		<appender-ref ref="STDOUT"/>
-		<appender-ref ref="CLUSTER"/>
+		<!--<appender-ref ref="CLUSTER"/>-->
 	</root>
 
 </configuration>

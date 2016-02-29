@@ -1,9 +1,10 @@
 
 package cz.cuni.mff.d3s.been.commons;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MonitorSample {
+public class MonitorSample implements Serializable {
 
     private long timestamp;
     private long freeMemory;

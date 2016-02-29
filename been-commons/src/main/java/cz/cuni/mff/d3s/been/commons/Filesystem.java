@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class Filesystem {
+import java.io.Serializable;
+
+public class Filesystem implements Serializable {
 
     private String deviceName;
     private String directory;

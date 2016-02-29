@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class Java {
+import java.io.Serializable;
+
+public class Java implements Serializable {
 
     private String version;
     private String vendor;
@@ -14,55 +16,62 @@ public class Java {
         return version;
     }
 
-    public void setVersion(String version) {
+    public Java setVersion(String version) {
         this.version = version;
+        return this;
     }
 
     public String getVendor() {
         return vendor;
     }
 
-    public void setVendor(String vendor) {
+    public Java setVendor(String vendor) {
         this.vendor = vendor;
+        return this;
     }
 
     public String getRuntimeName() {
         return runtimeName;
     }
 
-    public void setRuntimeName(String runtimeName) {
+    public Java setRuntimeName(String runtimeName) {
         this.runtimeName = runtimeName;
+        return this;
     }
 
     public String getVmVersion() {
         return vmVersion;
     }
 
-    public void setVmVersion(String vmVersion) {
+    public Java setVmVersion(String vmVersion) {
         this.vmVersion = vmVersion;
+        return this;
     }
 
     public String getVmVendor() {
         return vmVendor;
     }
 
-    public void setVmVendor(String vmVendor) {
+    public Java setVmVendor(String vmVendor) {
         this.vmVendor = vmVendor;
+        return this;
     }
 
     public String getRuntimeVersion() {
         return runtimeVersion;
     }
 
-    public void setRuntimeVersion(String runtimeVersion) {
+    public Java setRuntimeVersion(String runtimeVersion) {
         this.runtimeVersion = runtimeVersion;
+        return this;
     }
 
     public String getSpecificationVersion() {
         return specificationVersion;
     }
 
-    public void setSpecificationVersion(String specificationVersion) {
+    public Java setSpecificationVersion(String specificationVersion) {
         this.specificationVersion = specificationVersion;
+        return this;
     }
 }

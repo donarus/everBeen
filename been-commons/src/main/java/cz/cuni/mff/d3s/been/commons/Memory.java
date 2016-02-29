@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class Memory {
+import java.io.Serializable;
+
+public class Memory implements Serializable {
 
     private long ram;
     private long swap;

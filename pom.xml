@@ -204,10 +204,14 @@
 		<!--<module>task-manager</module>-->
 		<module>util</module>
 		<module>been-commons</module>
+		<module>web-ui</module>
+		<module>apis</module>
 		<!--<module>web-interface</module>-->
 		<!--<module>web-interface-standalone</module>-->
 		<!--<module>xsd-export</module>
 		<module>xsd-catalog-resolver</module>-->
+		<module>app</module>
+		<module>swr</module>
 	</modules>
 
 	<distributionManagement>

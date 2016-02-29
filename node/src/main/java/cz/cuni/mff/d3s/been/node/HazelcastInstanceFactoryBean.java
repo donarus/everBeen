@@ -5,8 +5,8 @@ import com.hazelcast.config.ServiceConfig;
 import com.hazelcast.config.ServicesConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import cz.cuni.mff.d3s.been.cluster.rpc.RemoteServiceRegistrator;
 import cz.cuni.mff.d3s.been.commons.NodeType;
+import cz.cuni.mff.d3s.been.service.rpc.RemoteServiceRegistrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -46,7 +46,8 @@ public class HazelcastInstanceFactoryBean extends AbstractFactoryBean<HazelcastI
             throw new Exception("unknown node type " + nodeType);
         }
 
-        return Hazelcast.newHazelcastInstance(new Config().setServicesConfig(ssc).setLiteMember(lite));
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(new Config().setServicesConfig(ssc).setLiteMember(lite));
+        return hazelcastInstance;
     }
 
 }

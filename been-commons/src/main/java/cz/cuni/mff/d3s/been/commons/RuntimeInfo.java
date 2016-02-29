@@ -1,9 +1,10 @@
 package cz.cuni.mff.d3s.been.commons;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class RuntimeInfo {
+public class RuntimeInfo implements Serializable {
     private String id;
     private int port;
     private String host;

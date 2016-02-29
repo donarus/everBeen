@@ -1,11 +1,13 @@
 package cz.cuni.mff.d3s.been.commons;
 
+import cz.cuni.mff.d3s.been.commons.bpk.BpkFile;
+
 import java.io.Serializable;
 
 public class TaskDefinition implements Serializable {
     private String name;
 
-    private BpkPointer bpkPointer;
+    private BpkFile bpkFile;
 
     public String getName() {
         return name;
@@ -15,11 +17,11 @@ public class TaskDefinition implements Serializable {
         this.name = name;
     }
 
-    public BpkPointer getBpkPointer() {
-        return bpkPointer;
+    public BpkFile getBpkFile() {
+        return bpkFile;
     }
 
-    public void setBpkPointer(BpkPointer bpkPointer) {
-        this.bpkPointer = bpkPointer;
+    public void setBpkFile(BpkFile bpkFile) {
+        this.bpkFile = bpkFile;
     }
 }

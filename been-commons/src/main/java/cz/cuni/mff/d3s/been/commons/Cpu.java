@@ -1,8 +1,9 @@
 package cz.cuni.mff.d3s.been.commons;
 
 
-public class Cpu
-{
+import java.io.Serializable;
+
+public class Cpu implements Serializable {
     private String vendor;
     private String model;
     private int mhz;

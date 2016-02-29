@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class LoadAverage {
+import java.io.Serializable;
+
+public class LoadAverage implements Serializable {
 
     private double load1;
     private double load5;

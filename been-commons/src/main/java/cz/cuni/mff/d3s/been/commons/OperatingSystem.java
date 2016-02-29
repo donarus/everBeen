@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class OperatingSystem {
+import java.io.Serializable;
+
+public class OperatingSystem implements Serializable {
 
     private String name;
     private String version;

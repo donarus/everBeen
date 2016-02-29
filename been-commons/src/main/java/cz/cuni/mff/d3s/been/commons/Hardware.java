@@ -1,8 +1,9 @@
 package cz.cuni.mff.d3s.been.commons;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Hardware {
+public class Hardware implements Serializable {
 
     private List<Cpu> cpu;
     private List<NetworkInterface> networkInterface;

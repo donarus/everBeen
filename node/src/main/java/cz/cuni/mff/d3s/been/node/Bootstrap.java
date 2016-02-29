@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.been.node;
 
-import cz.cuni.mff.d3s.been.BeenServiceConfiguration;
 import cz.cuni.mff.d3s.been.commons.NodeType;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -13,20 +12,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceLoader;
 
-import static cz.cuni.mff.d3s.been.core.StatusCode.EX_OK;
-import static cz.cuni.mff.d3s.been.core.StatusCode.EX_USAGE;
+import static cz.cuni.mff.d3s.been.node.StatusCode.EX_USAGE;
 
 public class Bootstrap {
 
@@ -41,26 +35,17 @@ public class Bootstrap {
     @Option(name = "-cf", aliases = {"--config-file"}, usage = "Path or URL to BEEN config file.")
     private String configFile;
 
-    @Option(name = "-dc", aliases = {"--dump-config"}, usage = "Whether to print runtime configuration and exit")
-    private boolean dumpConfig;
-
     @Option(name = "-h", aliases = {"--help"}, usage = "Prints help")
     private boolean printHelp = false;
 
     public static void main(String[] args) {
-        String[] testArgs = new String[]{"-s", "host-runtime"};
-        new Bootstrap().bootstrap(testArgs);
+        new Bootstrap().bootstrap(args);
     }
 
     public void bootstrap(final String[] args) {
         parseCmdLineArguments(args);
 
         Properties properties = loadProperties();
-
-        if (dumpConfig) {
-            printBeenConfiguration(properties);
-            EX_OK.sysExit();
-        }
 
         if (printHelp) {
             printUsage();
@@ -69,7 +54,7 @@ public class Bootstrap {
 
         ClassPathXmlApplicationContext context = startApplicationContext(properties);
 
-        Been been = context.getBean(Been.class);
+        Node been = context.getBean(Node.class);
         been.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> been.stop()));
     }
@@ -165,59 +150,6 @@ public class Bootstrap {
         }
 
         throw new AssertionError(); // will not get here, make the compiler happy
-    }
-
-    /**
-     * Prints runtime configuration of BEEN.
-     *
-     * @param properties user specified properties
-     */
-    private void printBeenConfiguration(final Properties properties) {
-
-        final String DEFAULT_VALUE_PREFIX = "DEFAULT_"; // by convention
-
-        final ServiceLoader<BeenServiceConfiguration> configs = ServiceLoader.load(BeenServiceConfiguration.class);
-
-        for (BeenServiceConfiguration config : configs) {
-            Class<?> klazz = config.getClass();
-
-            System.out.printf("#%n# %s%n#%n%n", klazz.getSimpleName());
-
-            Map<String, Object> defaultValues = new HashMap<>();
-            Map<String, String> propertyNames = new HashMap<>();
-
-            for (Field field : klazz.getDeclaredFields()) {
-                final String name = field.getName();
-
-                try {
-                    if (name.startsWith(DEFAULT_VALUE_PREFIX)) {
-                        String propertyName = name.substring(DEFAULT_VALUE_PREFIX.length());
-                        defaultValues.put(propertyName, field.get(config));
-                    } else {
-                        propertyNames.put(name, field.get(config).toString());
-                    }
-
-                } catch (IllegalAccessException e) {
-                    String msg = String.format("Cannot get value for '%s'", name);
-                    log.error(msg, e);
-                }
-            }
-
-            for (Map.Entry<String, String> entry : propertyNames.entrySet()) {
-                String name = entry.getValue();
-                Object value = defaultValues.get(entry.getKey());
-
-                if (properties.containsKey(name)) {
-                    System.out.printf("%s=%s%n", entry.getValue(), value);
-                } else {
-                    System.out.printf("# %s=%s%n", entry.getValue(), value);
-                }
-
-            }
-
-            System.out.printf("%n%n%n");
-
-        }
     }
 
 }

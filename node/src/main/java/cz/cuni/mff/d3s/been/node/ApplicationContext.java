@@ -1,24 +1,43 @@
 package cz.cuni.mff.d3s.been.node;
 
+import com.hazelcast.core.HazelcastInstance;
+import cz.cuni.mff.d3s.been.commons.NodeInfo;
+import cz.cuni.mff.d3s.been.commons.NodeType;
+import cz.cuni.mff.d3s.been.detectors.Detector;
 import cz.cuni.mff.d3s.been.service.BeenUUIDGenerator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Date;
 
 @Configuration
 public class ApplicationContext {
 
     @Bean(name = "beenNodeId")
-    public String beenNodeId(BeenUUIDGenerator beenUUIDGenerator) {
-        return beenUUIDGenerator.generate();
+    public String beenNodeId(HazelcastInstance hazelcastInstance) {
+        return hazelcastInstance.getCluster().getLocalMember().getUuid();
     }
 
-    @Bean(name = "been")
-    public Been been() {
-        return new Been();
+    @Bean(name = "node")
+    public Node node() {
+        return new Node();
+    }
+
+    @Bean
+    public NodeInfo nodeInfo(
+            @Qualifier("beenNodeId") String beenNodeId,
+            NodeType nodeType,
+            @Qualifier("beenWorkingDirectory") File beenWorkingDirectory
+    ) {
+        return new Detector().detect()
+                .setId(beenNodeId)
+                .setBeenWorkingDirectory(beenWorkingDirectory.getAbsolutePath())
+                .setStartUpTime(new Date())
+                .setNodeType(nodeType);
     }
 
     @Bean(name = "beenUUIDGenerator")
@@ -27,7 +46,6 @@ public class ApplicationContext {
     }
 
     @Bean(name = "hazelcastInstance")
-
     public HazelcastInstanceFactoryBean hazelcastInstance() {
         return new HazelcastInstanceFactoryBean();
     }

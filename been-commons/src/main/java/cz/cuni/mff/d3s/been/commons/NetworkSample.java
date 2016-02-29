@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-public class NetworkSample {
+import java.io.Serializable;
+
+public class NetworkSample implements Serializable {
 
     private String name;
     private long bytesIn;

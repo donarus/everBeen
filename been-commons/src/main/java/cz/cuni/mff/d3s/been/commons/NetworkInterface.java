@@ -1,8 +1,8 @@
 package cz.cuni.mff.d3s.been.commons;
 
-import java.util.List;
+import java.io.Serializable;
 
-public class NetworkInterface {
+public class NetworkInterface implements Serializable {
 
     private String name;
     private String hwaddr;
@@ -10,7 +10,7 @@ public class NetworkInterface {
     private long mtu;
     private String netmask;
     private String broadcast;
-    private List<String> address;
+    private String address;
 
     public String getName() {
         return name;
@@ -60,11 +60,11 @@ public class NetworkInterface {
         this.broadcast = broadcast;
     }
 
-    public List<String> getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    public void setAddress(List<String> address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 }

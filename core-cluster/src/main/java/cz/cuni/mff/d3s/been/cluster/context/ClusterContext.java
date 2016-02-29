@@ -2,13 +2,11 @@ package cz.cuni.mff.d3s.been.cluster.context;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;
-import cz.cuni.mff.d3s.been.cluster.NodeType;
+import cz.cuni.mff.d3s.been.commons.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Executors;
