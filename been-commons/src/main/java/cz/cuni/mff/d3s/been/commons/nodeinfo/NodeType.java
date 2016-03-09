@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.been.commons;
+package cz.cuni.mff.d3s.been.commons.nodeinfo;
 
 /**
  *

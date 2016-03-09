@@ -1,5 +1,5 @@
 
-package cz.cuni.mff.d3s.been.commons;
+package cz.cuni.mff.d3s.been.commons.monitorsample;
 
 import java.io.Serializable;
 import java.util.List;

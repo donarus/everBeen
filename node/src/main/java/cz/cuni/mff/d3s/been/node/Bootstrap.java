@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.been.node;
 
-import cz.cuni.mff.d3s.been.commons.NodeType;
+import cz.cuni.mff.d3s.been.commons.exceptions.NodeException;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeType;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static cz.cuni.mff.d3s.been.node.StatusCode.EX_OTHER;
 import static cz.cuni.mff.d3s.been.node.StatusCode.EX_USAGE;
 
 public class Bootstrap {
@@ -55,7 +57,12 @@ public class Bootstrap {
         ClassPathXmlApplicationContext context = startApplicationContext(properties);
 
         Node been = context.getBean(Node.class);
-        been.start();
+        try {
+            been.start();
+        } catch (NodeException e) {
+            log.error("Node cannot be started.", e);
+            EX_OTHER.sysExit();
+        }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> been.stop()));
     }
 

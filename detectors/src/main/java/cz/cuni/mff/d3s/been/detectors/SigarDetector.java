@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.been.detectors;
 
-import cz.cuni.mff.d3s.been.commons.*;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.*;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Cpu;
 import org.apache.commons.io.IOUtils;
 import org.hyperic.jni.ArchLoader;
 import org.hyperic.jni.ArchNotSupportedException;
@@ -106,9 +107,9 @@ public class SigarDetector implements IDetector {
 
             Hardware hw = new Hardware();
 
-            List<cz.cuni.mff.d3s.been.commons.Cpu> cpus = new ArrayList<>();
+            List<cz.cuni.mff.d3s.been.commons.nodeinfo.Cpu> cpus = new ArrayList<>();
             for (CpuInfo i : sigar.getCpuInfoList()) {
-                cz.cuni.mff.d3s.been.commons.Cpu cpu = new cz.cuni.mff.d3s.been.commons.Cpu();
+                Cpu cpu = new Cpu();
                 cpu.setVendor(i.getVendor());
                 cpu.setModel(i.getModel());
                 cpu.setMhz(i.getMhz());
@@ -152,8 +153,8 @@ public class SigarDetector implements IDetector {
      *
      * @return operating system info.
      */
-    public cz.cuni.mff.d3s.been.commons.OperatingSystem detectOperatingSystem() {
-        cz.cuni.mff.d3s.been.commons.OperatingSystem os = new cz.cuni.mff.d3s.been.commons.OperatingSystem();
+    public cz.cuni.mff.d3s.been.commons.nodeinfo.OperatingSystem detectOperatingSystem() {
+        cz.cuni.mff.d3s.been.commons.nodeinfo.OperatingSystem os = new cz.cuni.mff.d3s.been.commons.nodeinfo.OperatingSystem();
 
         try {
             loadSigar();

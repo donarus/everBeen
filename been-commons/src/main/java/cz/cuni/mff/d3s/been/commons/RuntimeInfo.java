@@ -1,5 +1,11 @@
 package cz.cuni.mff.d3s.been.commons;
 
+import cz.cuni.mff.d3s.been.commons.monitorsample.MonitorSample;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Filesystem;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Hardware;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Java;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.OperatingSystem;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

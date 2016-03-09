@@ -2,7 +2,8 @@ package cz.cuni.mff.d3s.been.webapi.nodes;
 
 import com.google.gson.Gson;
 import com.hazelcast.core.HazelcastInstance;
-import cz.cuni.mff.d3s.been.commons.NodeInfo;
+import cz.cuni.mff.d3s.been.commons.MapNames;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeInfo;
 import cz.cuni.mff.d3s.been.service.rpc.ACP;
 import org.springframework.context.ApplicationContext;
 import spark.Request;
@@ -11,7 +12,6 @@ import spark.Route;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Nodes implements Route {
 
@@ -59,10 +59,10 @@ public class Nodes implements Route {
     }
 
     private List<NodeInfo> list() {
-        return new ArrayList<>(hazelcastInstance.<String, NodeInfo>getMap("BEEN_NODE_INFO_MAP").values());
+        return new ArrayList<>(hazelcastInstance.<String, NodeInfo>getMap(MapNames.NODE_INFO).values());
     }
 
     private NodeInfo get(String id) {
-        return hazelcastInstance.<String, NodeInfo>getMap("BEEN_NODE_INFO_MAP").get(id);
+        return hazelcastInstance.<String, NodeInfo>getMap(MapNames.NODE_INFO).get(id);
     }
 }

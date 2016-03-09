@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.been.api.operations;
 
 import com.hazelcast.spi.AbstractOperation;
-import cz.cuni.mff.d3s.been.commons.TaskDefinition;
+import cz.cuni.mff.d3s.been.commons.monitorsample.TaskDefinition;
 import cz.cuni.mff.d3s.been.processmanager.ProcessManager;
 import cz.cuni.mff.d3s.been.service.rpc.ACP;
 import org.springframework.context.ApplicationContext;

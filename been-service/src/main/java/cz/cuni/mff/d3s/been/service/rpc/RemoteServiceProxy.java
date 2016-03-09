@@ -8,6 +8,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.util.ExceptionUtil;
+import cz.cuni.mff.d3s.been.commons.MapNames;
 import org.springframework.context.ApplicationContext;
 
 import java.util.concurrent.Future;
@@ -39,7 +40,7 @@ public abstract class RemoteServiceProxy extends AbstractDistributedObject<Remot
     }
 
     protected final <T> T invokeOperation(Operation operation) {
-        ReplicatedMap<String, Address> addresses = hazelcastInstance.getReplicatedMap("NODE_ADDRESSES");
+        ReplicatedMap<String, Address> addresses = hazelcastInstance.getReplicatedMap(MapNames.NODE_ADDRESSES);
         Address address = addresses.get(name);
         if (address != null) {
             NodeEngine nodeEngine = getNodeEngine();

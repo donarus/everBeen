@@ -1,9 +1,9 @@
 package cz.cuni.mff.d3s.been.detectors;
 
-import cz.cuni.mff.d3s.been.commons.Filesystem;
-import cz.cuni.mff.d3s.been.commons.Hardware;
-import cz.cuni.mff.d3s.been.commons.Java;
-import cz.cuni.mff.d3s.been.commons.OperatingSystem;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Filesystem;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Hardware;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.Java;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.OperatingSystem;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.been.processmanager;
 
 import cz.cuni.mff.d3s.been.commons.bpk.Bpk;
-import cz.cuni.mff.d3s.been.commons.TaskDefinition;
+import cz.cuni.mff.d3s.been.commons.monitorsample.TaskDefinition;
 import org.apache.commons.exec.CommandLine;
 
 import java.io.File;

@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.been.detectors;
 
-import cz.cuni.mff.d3s.been.commons.*;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.*;
 import org.apache.commons.collections.EnumerationUtils;
 
 import java.io.File;
@@ -52,10 +52,10 @@ public class JavaDetector implements IDetector {
         try {
             Enumeration<NetworkInterface> ifs = NetworkInterface.getNetworkInterfaces();
 
-            List<cz.cuni.mff.d3s.been.commons.NetworkInterface> networkInterfaces = new ArrayList<>();
+            List<cz.cuni.mff.d3s.been.commons.nodeinfo.NetworkInterface> networkInterfaces = new ArrayList<>();
             for (Object i : EnumerationUtils.toList(ifs)) {
                 NetworkInterface iface = (NetworkInterface) i;
-                cz.cuni.mff.d3s.been.commons.NetworkInterface networkInterface = new cz.cuni.mff.d3s.been.commons.NetworkInterface();
+                cz.cuni.mff.d3s.been.commons.nodeinfo.NetworkInterface networkInterface = new cz.cuni.mff.d3s.been.commons.nodeinfo.NetworkInterface();
                 networkInterface.setName(iface.getName());
                 networkInterface.setMtu(iface.getMTU());
 

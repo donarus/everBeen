@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.been.swrep;
 
 import cz.cuni.mff.d3s.been.service.BeenUUIDGenerator;
-import cz.cuni.mff.d3s.been.swrep.api.SoftwareRepositoryAPIServiceRegistrator;
+import cz.cuni.mff.d3s.been.swrep.api.SoftwareRepositoryAPIServiceDefinition;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +20,8 @@ public class SoftwareRepositoryApplicationContext {
     }
 
     @Bean(name = "softwareRepositoryAPIServiceRegistrator")
-    SoftwareRepositoryAPIServiceRegistrator softwareRepositoryAPIServiceRegistrator() {
-        return new SoftwareRepositoryAPIServiceRegistrator();
+    SoftwareRepositoryAPIServiceDefinition softwareRepositoryAPIServiceRegistrator() {
+        return new SoftwareRepositoryAPIServiceDefinition();
     }
 
     @Bean(name = "softwareRepositoryWorkingDirectory")

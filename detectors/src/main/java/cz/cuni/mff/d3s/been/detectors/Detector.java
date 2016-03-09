@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.been.detectors;
 
-import cz.cuni.mff.d3s.been.commons.NodeInfo;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeInfo;
 
 /**
  * Hw and OS detector.

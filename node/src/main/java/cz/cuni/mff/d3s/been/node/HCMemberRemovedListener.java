@@ -6,21 +6,20 @@ import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 
 abstract class HCMemberRemovedListener implements InitialMembershipListener {
-    @Override
-    public final void init(InitialMembershipEvent event) {
-
-    }
-
-    @Override
-    public final void memberAdded(MembershipEvent membershipEvent) {
-
-    }
 
     @Override
     public abstract void memberRemoved(MembershipEvent membershipEvent);
 
     @Override
-    public final void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
-
+    public final void init(InitialMembershipEvent event) {
     }
+
+    @Override
+    public final void memberAdded(MembershipEvent membershipEvent) {
+    }
+
+    @Override
+    public final void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
+    }
+
 }

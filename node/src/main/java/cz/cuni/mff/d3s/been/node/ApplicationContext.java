@@ -1,8 +1,8 @@
 package cz.cuni.mff.d3s.been.node;
 
 import com.hazelcast.core.HazelcastInstance;
-import cz.cuni.mff.d3s.been.commons.NodeInfo;
-import cz.cuni.mff.d3s.been.commons.NodeType;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeInfo;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeType;
 import cz.cuni.mff.d3s.been.detectors.Detector;
 import cz.cuni.mff.d3s.been.service.BeenUUIDGenerator;
 import org.springframework.beans.factory.annotation.Qualifier;

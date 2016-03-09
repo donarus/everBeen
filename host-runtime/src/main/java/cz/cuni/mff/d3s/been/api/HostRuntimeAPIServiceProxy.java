@@ -1,18 +1,15 @@
 package cz.cuni.mff.d3s.been.api;
 
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.spi.Operation;
 import cz.cuni.mff.d3s.been.api.operations.GetIdOperation;
 import cz.cuni.mff.d3s.been.api.operations.RunTaskOperation;
 import cz.cuni.mff.d3s.been.hr.HostRuntimeAPI;
 import cz.cuni.mff.d3s.been.hr.HostRuntimeException;
-import cz.cuni.mff.d3s.been.processmanager.ProcessManager;
 import cz.cuni.mff.d3s.been.service.rpc.RemoteService;
 import cz.cuni.mff.d3s.been.service.rpc.RemoteServiceProxy;
-import cz.cuni.mff.d3s.been.commons.TaskDefinition;
+import cz.cuni.mff.d3s.been.commons.monitorsample.TaskDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.task.TaskExecutor;
 
 import java.util.concurrent.Executor;
 

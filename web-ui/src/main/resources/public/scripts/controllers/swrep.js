@@ -1,7 +1,7 @@
 "use strict";
 var app = angular.module("beenApp");
 
-app.service('swRepoService', function ($http) {
+app.service('swRepService', function ($http) {
     delete $http.defaults.headers.common['X-Requested-With'];
     this.list = function () {
         return $http({
@@ -11,9 +11,9 @@ app.service('swRepoService', function ($http) {
     };
 });
 
-app.controller('SwRepoCtrl', function ($scope, swRepoService, $interval) {
+app.controller('SwRepCtrl', function ($scope, swRepService) {
     $scope.bpks = null;
-    swRepoService.list().then(function (data) {
+    swRepService.list().then(function (data) {
         $scope.bpks = data.data
     });
 });

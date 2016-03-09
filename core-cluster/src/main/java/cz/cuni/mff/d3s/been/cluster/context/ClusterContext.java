@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.been.cluster.context;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.*;
-import cz.cuni.mff.d3s.been.commons.NodeType;
+import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

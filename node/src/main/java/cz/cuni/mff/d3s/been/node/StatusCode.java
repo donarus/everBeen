@@ -11,13 +11,13 @@ public enum StatusCode {
 	EX_OK(0),
 
 	/** General catch-all error */
-	EX_UNKNOWN(1),
+	EX_OTHER(1),
 
 	/** Process was incorrectly invoked, i.e. with bad command line argumens. */
 	EX_USAGE(67),
 
 	/** Trying to run unknown been service */
-	INVALID_BEEN_SERVICES(68),
+	EX_INVALID_BEEN_SERVICES(68),
 
 	/** A component of this process has failed to run. */
 	EX_COMPONENT_FAILED(128),
@@ -34,7 +34,7 @@ public enum StatusCode {
 	 * @param code
 	 *          the code associated with the status.
 	 */
-	private StatusCode(int code) {
+	StatusCode(int code) {
 		this.code = code;
 	}
 

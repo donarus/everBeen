@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.been;
 
-import cz.cuni.mff.d3s.been.api.HostRuntimeAPIServiceRegistrator;
+import cz.cuni.mff.d3s.been.api.HostRuntimeAPIServiceDefinition;
 import cz.cuni.mff.d3s.been.processmanager.CmdLineBuilder;
 import cz.cuni.mff.d3s.been.processmanager.ProcessManager;
 import cz.cuni.mff.d3s.been.service.BeenUUIDGenerator;
@@ -49,8 +49,8 @@ public class HostRuntimeApplicationContext {
     }
 
     @Bean(name = "hostRuntimeAPIServiceRegistrator")
-    HostRuntimeAPIServiceRegistrator hostRuntimeAPIServiceRegistrator() {
-        return new HostRuntimeAPIServiceRegistrator();
+    HostRuntimeAPIServiceDefinition hostRuntimeAPIServiceRegistrator() {
+        return new HostRuntimeAPIServiceDefinition();
     }
 
     private final File mkdir(File parent, String child) {
