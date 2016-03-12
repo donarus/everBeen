@@ -5,7 +5,7 @@ package cz.cuni.mff.d3s.been.node;
  * 
  * @author Martin Sixta
  */
-public enum StatusCode {
+enum StatusCode {
 
 	/** Process terminated normally */
 	EX_OK(0),

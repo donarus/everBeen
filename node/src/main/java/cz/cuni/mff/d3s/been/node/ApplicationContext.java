@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.util.Date;
 
 @Configuration
-public class ApplicationContext {
+class ApplicationContext {
 
     @Bean(name = "beenNodeId")
     public String beenNodeId(HazelcastInstance hazelcastInstance) {
@@ -24,7 +24,7 @@ public class ApplicationContext {
 
     @Bean(name = "node")
     public Node node() {
-        return new Node();
+        return new NodeImpl();
     }
 
     @Bean

@@ -15,16 +15,14 @@ import org.springframework.context.support.GenericApplicationContext;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
 import static cz.cuni.mff.d3s.been.node.StatusCode.EX_OTHER;
 import static cz.cuni.mff.d3s.been.node.StatusCode.EX_USAGE;
 
-public class Bootstrap {
+class Bootstrap {
 
     private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
 
@@ -63,7 +61,14 @@ public class Bootstrap {
             log.error("Node cannot be started.", e);
             EX_OTHER.sysExit();
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> been.stop()));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                been.stop();
+            } catch (NodeException e) {
+                log.error("Node cannot be gracefully stopped.", e);
+                EX_OTHER.sysExit();
+            }
+        }));
     }
 
     private ClassPathXmlApplicationContext startApplicationContext(Properties properties) {
@@ -112,51 +117,32 @@ public class Bootstrap {
     }
 
     private Properties loadProperties() {
-
         if (configFile == null || configFile.isEmpty()) {
             log.info("No config file or url specified. Will start with default configuration.");
             return new Properties();
         }
 
-        PropertyLoader loader = null;
-
-        // try as a file
         try {
-            Path path = Paths.get(configFile);
-            if (Files.exists(path)) {
-                loader = PropertyLoader.fromPath(path);
-            }
-        } catch (InvalidPathException e) {
-            // quell
-        }
-
-        // try as an URL
-        if (loader == null) {
-            try {
-                URL url = new URL(configFile);
-                loader = PropertyLoader.fromUrl(url);
-            } catch (MalformedURLException e) {
-                // quell
-            }
-        }
-
-        if (loader == null) {
-            log.error("{} is not a file nor an URL. Aborting.", configFile);
-            EX_USAGE.sysExit();
-            throw new AssertionError(); // make the compiler happy
-        }
-
-        try {
-            Properties properties = loader.load();
-            log.info("Configuration loaded from {}", configFile);
-            return properties;
+            return PropertyLoader.load(new URL(configFile)); // try as an URL
+        } catch (MalformedURLException e) {
+            // ignore
         } catch (IOException e) {
-            String msg = String.format("Cannot load properties from %s. Aborting.", configFile);
-            log.error(msg, e);
+            log.error("Can't load config from given url '{}'.", configFile, e);
             EX_USAGE.sysExit();
         }
 
-        throw new AssertionError(); // will not get here, make the compiler happy
+        try {
+            return PropertyLoader.load(Paths.get(configFile)); // try as a Path
+        } catch (InvalidPathException e) {
+            // ignore
+        } catch (IOException e) {
+            log.error("Can't load config from given path '{}'.", configFile, e);
+            EX_USAGE.sysExit();
+        }
+
+        log.error("'{}' is not a file nor an URL. Aborting.", configFile);
+        EX_USAGE.sysExit();
+        throw new AssertionError(); // make the compiler happy
     }
 
 }

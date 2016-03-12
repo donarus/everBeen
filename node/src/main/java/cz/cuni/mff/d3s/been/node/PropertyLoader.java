@@ -1,99 +1,45 @@
 package cz.cuni.mff.d3s.been.node;
 
-import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
 /**
- * Defines interface and utility factory functions for loading properties files
- * from different resources.
- * 
- * @author Martin Sixta
+ * Utility for loading properties from different resources.
  */
-public abstract class PropertyLoader {
+public final class PropertyLoader {
 
-	/**
-	 * Loads {@link Properties} from an external resource.
-	 * 
-	 * @return properties loaded from an external source
-	 * @throws IOException
-	 *           when the resource cannot be loaded
-	 */
-	public abstract Properties load() throws IOException;
+    /**
+     * Loads properties from given url
+     *
+     * @param url
+     * @throws IOException when the resource cannot be loaded
+     */
+    public static Properties load(URL url) throws IOException {
+        return load(url.openStream());
+    }
 
-	/**
-	 * Creates {@link PropertyLoader} for an {@link URL} resource
-	 * 
-	 * @param url
-	 *          URL location of the resource
-	 * @return loader bind to the <code>url</code>
-	 */
-	public static PropertyLoader fromUrl(URL url) {
-		return new UrlPropertyReader(url);
-	}
+    /**
+     * Loads properties from given path
+     *
+     * @param path
+     * @throws IOException when the resource cannot be loaded
+     */
+    public static Properties load(Path path) throws IOException {
+        return load(new FileInputStream(path.toFile()));
+    }
 
-	/**
-	 * Creates {@link PropertyLoader} for a {@link Path}
-	 * 
-	 * @param path
-	 *          location of the resource
-	 * @return loader bind to the <code>path</code>
-	 */
-	public static PropertyLoader fromPath(Path path) {
-		return new PathPropertyLoader(path);
-	}
+    private static Properties load(InputStream stream) throws IOException {
+        Properties properties = new Properties();
 
-	/**
-	 * Implementation of a {@link PropertyLoader} which creates Properties from a
-	 * {@link Path}.
-	 */
-	private static class PathPropertyLoader extends PropertyLoader {
-		private final Path path;
+        try (InputStream in = stream) {
+            properties.load(in);
+        }
 
-		private PathPropertyLoader(Path path) {
-			this.path = path;
-		}
-
-		@Override
-		public Properties load() throws IOException {
-			Properties properties = new Properties();
-
-			try (final BufferedReader in = Files.newBufferedReader(path, Charset.defaultCharset())) {
-				properties.load(in);
-			}
-
-			return properties;
-
-		}
-	}
-
-	/**
-	 * Implementation of a {@link PropertyLoader} which creates Properties from an
-	 * {@link URL}.
-	 */
-	private static class UrlPropertyReader extends PropertyLoader {
-		private final URL url;
-
-		private UrlPropertyReader(URL url) {
-			this.url = url;
-		}
-
-		@Override
-		public Properties load() throws IOException {
-			Properties properties = new Properties();
-
-			try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
-
-				properties.load(in);
-
-				return properties;
-			}
-		}
-	}
+        return properties;
+    }
 
 }

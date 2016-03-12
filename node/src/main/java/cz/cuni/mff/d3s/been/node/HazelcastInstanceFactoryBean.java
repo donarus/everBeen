@@ -18,7 +18,7 @@ import java.util.List;
  * configuration of {@link NodeType}. During the instantiation it also registers all remote services
  * implementing interface {@link RemoteServiceDefinition}.
  */
-public final class HazelcastInstanceFactoryBean extends AbstractFactoryBean<HazelcastInstance> {
+final class HazelcastInstanceFactoryBean extends AbstractFactoryBean<HazelcastInstance> {
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired

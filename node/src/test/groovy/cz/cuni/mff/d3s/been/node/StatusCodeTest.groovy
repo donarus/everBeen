@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 import java.security.Permission
 
-import static cz.cuni.mff.d3s.been.node.StatusCode.*
+import static StatusCode.*
 
 class StatusCodeTest extends Specification {
 
