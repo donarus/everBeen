@@ -1,15 +1,14 @@
-package cz.cuni.mff.d3s.been.service.rpc;
+package cz.cuni.mff.d3s.been.service;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ACP implements ApplicationContextAware {
+public final class ACP implements ApplicationContextAware {
     private static ApplicationContext context;
 
-    private ACP() {}
+    ACP() {}
 
     @Override
     public void setApplicationContext(ApplicationContext ac)
@@ -18,6 +17,6 @@ public class ACP implements ApplicationContextAware {
     }
 
     public static ApplicationContext getApplicationContext() {
-        return new ACP().context;
+        return context;
     }
 }

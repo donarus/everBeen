@@ -17,12 +17,8 @@ import static java.util.concurrent.Executors.newCachedThreadPool;
 
 public class HostRuntimeAPIServiceProxy extends RemoteServiceProxy implements HostRuntimeAPI {
 
-    private static final Logger log = LoggerFactory.getLogger(HostRuntimeAPIServiceProxy.class);
-
-    private Executor threadPool = newCachedThreadPool();
-
-    public HostRuntimeAPIServiceProxy(String name, NodeEngine nodeEngine, RemoteService remoteService) {
-        super(name, nodeEngine, remoteService);
+    public HostRuntimeAPIServiceProxy(String nodeName, NodeEngine nodeEngine, RemoteService remoteService) {
+        super(nodeName, nodeEngine, remoteService);
     }
 
     @Override

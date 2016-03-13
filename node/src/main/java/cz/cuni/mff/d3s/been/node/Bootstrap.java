@@ -123,7 +123,7 @@ class Bootstrap {
         }
 
         try {
-            return PropertyLoader.load(new URL(configFile)); // try as an URL
+            return PropertiesLoader.load(new URL(configFile)); // try as an URL
         } catch (MalformedURLException e) {
             // ignore
         } catch (IOException e) {
@@ -132,7 +132,7 @@ class Bootstrap {
         }
 
         try {
-            return PropertyLoader.load(Paths.get(configFile)); // try as a Path
+            return PropertiesLoader.load(Paths.get(configFile)); // try as a Path
         } catch (InvalidPathException e) {
             // ignore
         } catch (IOException e) {

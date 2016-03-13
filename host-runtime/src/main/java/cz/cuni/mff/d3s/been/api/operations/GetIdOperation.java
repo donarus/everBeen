@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.been.api.operations;
 
 import com.hazelcast.spi.AbstractOperation;
-import cz.cuni.mff.d3s.been.service.rpc.ACP;
+import cz.cuni.mff.d3s.been.service.ACP;
 
 public class GetIdOperation extends AbstractOperation {
     private String response = null;

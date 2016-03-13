@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 
 /**
  * Utility for loading properties from different resources.
  */
-public final class PropertyLoader {
+public final class PropertiesLoader {
 
     /**
      * Loads properties from given url

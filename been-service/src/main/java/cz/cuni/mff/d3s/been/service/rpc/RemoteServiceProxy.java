@@ -1,7 +1,6 @@
 package cz.cuni.mff.d3s.been.service.rpc;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ReplicatedMap;
 import com.hazelcast.nio.Address;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
@@ -9,24 +8,28 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.util.ExceptionUtil;
 import cz.cuni.mff.d3s.been.commons.MapNames;
+import cz.cuni.mff.d3s.been.service.ACP;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public abstract class RemoteServiceProxy extends AbstractDistributedObject<RemoteService> {
 
-    private final String name;
-    private RemoteService remoteService;
+    @Autowired
+    protected HazelcastInstance hazelcastInstance;
 
-    protected final ApplicationContext applicationContext;
-    protected final HazelcastInstance hazelcastInstance;
+    private final String nodeName;
 
-    public RemoteServiceProxy(String name, NodeEngine nodeEngine, RemoteService remoteService) {
+    private final RemoteService remoteService;
+
+    public RemoteServiceProxy(String nodeName, NodeEngine nodeEngine, RemoteService remoteService) {
         super(nodeEngine, remoteService);
-        this.name = name;
+        this.nodeName = nodeName;
         this.remoteService = remoteService;
-        this.applicationContext = ACP.getApplicationContext();
-        this.hazelcastInstance = applicationContext.getBean(HazelcastInstance.class);
+        ApplicationContext applicationContext = ACP.getApplicationContext();
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
     }
 
     @Override
@@ -36,12 +39,12 @@ public abstract class RemoteServiceProxy extends AbstractDistributedObject<Remot
 
     @Override
     public String getName() {
-        return name;
+        return nodeName;
     }
 
     protected final <T> T invokeOperation(Operation operation) {
-        ReplicatedMap<String, Address> addresses = hazelcastInstance.getReplicatedMap(MapNames.NODE_ADDRESSES);
-        Address address = addresses.get(name);
+        Map<String, Address> addresses = hazelcastInstance.getMap(MapNames.NODE_ADDRESSES);
+        Address address = addresses.get(nodeName);
         if (address != null) {
             NodeEngine nodeEngine = getNodeEngine();
             InvocationBuilder builder = nodeEngine.getOperationService()
@@ -53,14 +56,6 @@ public abstract class RemoteServiceProxy extends AbstractDistributedObject<Remot
                 throw ExceptionUtil.rethrow(e);
             }
         }
-        throw new RuntimeException("Unknown host '" + name + "'");
-    }
-
-    protected <T> T getBean(String name) {
-        return (T) applicationContext.getBean("hostRuntimeId");
-    }
-
-    protected <T> T getBean(Class<T> clazz) {
-        return (T) applicationContext.getBean(clazz);
+        throw new RuntimeException("Unknown host '" + nodeName + "'");
     }
 }

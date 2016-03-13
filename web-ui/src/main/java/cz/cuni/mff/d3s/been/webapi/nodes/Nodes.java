@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.hazelcast.core.HazelcastInstance;
 import cz.cuni.mff.d3s.been.commons.MapNames;
 import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeInfo;
-import cz.cuni.mff.d3s.been.service.rpc.ACP;
+import cz.cuni.mff.d3s.been.service.ACP;
 import org.springframework.context.ApplicationContext;
 import spark.Request;
 import spark.Response;

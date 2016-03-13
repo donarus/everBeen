@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.hazelcast.core.HazelcastInstance;
 import cz.cuni.mff.d3s.been.commons.bpk.BpkId;
 import cz.cuni.mff.d3s.been.hr.HostRuntimeAPI;
-import cz.cuni.mff.d3s.been.service.rpc.ACP;
+import cz.cuni.mff.d3s.been.service.ACP;
 import cz.cuni.mff.d3s.been.swr.SWRAPI;
 import cz.cuni.mff.d3s.been.swr.SWRException;
 import org.springframework.context.ApplicationContext;
@@ -13,9 +13,7 @@ import spark.Response;
 import spark.Route;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SoftwareRepository implements Route {
 

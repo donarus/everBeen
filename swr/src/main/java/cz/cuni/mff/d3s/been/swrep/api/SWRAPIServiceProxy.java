@@ -9,19 +9,22 @@ import cz.cuni.mff.d3s.been.service.rpc.RemoteServiceProxy;
 import cz.cuni.mff.d3s.been.swr.SWRAPI;
 import cz.cuni.mff.d3s.been.swr.SWRException;
 import cz.cuni.mff.d3s.been.swrep.SoftwareRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
 public class SWRAPIServiceProxy extends RemoteServiceProxy implements SWRAPI {
 
+    @Autowired
+    @Qualifier("softwareRepositoryId")
     private String softwareRepositoryId;
 
+    @Autowired
     private SoftwareRepository softwareRepository;
 
     public SWRAPIServiceProxy(String name, NodeEngine nodeEngine, RemoteService remoteService) {
         super(name, nodeEngine, remoteService);
-        this.softwareRepositoryId = getBean("softwareRepositoryId");
-        this.softwareRepository = getBean("softwareRepository");
     }
 
     @Override

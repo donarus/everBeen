@@ -8,8 +8,8 @@ public class HostRuntimeAPIService extends RemoteService {
     public static final String SERVICE_NAME = "HostRuntimeAPI";
 
     @Override
-    public DistributedObject createDistributedObject(String objectName) {
-        return new HostRuntimeAPIServiceProxy(objectName, nodeEngine, this);
+    public DistributedObject createDistributedObject(String nodeName) {
+        return new HostRuntimeAPIServiceProxy(nodeName, nodeEngine, this);
     }
 
     @Override

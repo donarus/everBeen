@@ -15,12 +15,10 @@ public abstract class RemoteService implements ManagedService, com.hazelcast.spi
 
     @Override
     public void reset() {
-
     }
 
     @Override
     public void shutdown(boolean terminate) {
-
     }
 
     @Override

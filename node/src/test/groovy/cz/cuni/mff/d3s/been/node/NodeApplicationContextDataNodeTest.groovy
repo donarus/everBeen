@@ -1,8 +1,6 @@
 package cz.cuni.mff.d3s.been.node
 
-import com.hazelcast.core.Hazelcast
 import com.hazelcast.core.HazelcastInstance
-import cz.cuni.mff.d3s.been.commons.exceptions.NodeException
 import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeInfo
 import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeType
 import cz.cuni.mff.d3s.been.service.BeenUUIDGenerator
@@ -11,15 +9,12 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-@ContextConfiguration(classes = [LiteNodeTestApplicationContext, ApplicationContext])
+@ContextConfiguration(classes = [DataNodeTestApplicationContext, NodeApplicationContext])
 @DirtiesContext
-class ApplicationContextLiteNodeTest extends Specification {
+class NodeApplicationContextDataNodeTest extends Specification {
 
     @Autowired
     String beenNodeId
-
-    @Autowired
-    BeenUUIDGenerator beenUUIDGenerator
 
     @Autowired
     File beenWorkingDirectory
@@ -31,19 +26,19 @@ class ApplicationContextLiteNodeTest extends Specification {
     NodeInfo nodeInfo
 
     @Autowired
+    BeenUUIDGenerator beenUUIDGenerator
+
+    @Autowired
     Node node
 
-    def 'beenNodeId is 36 chars long'() {
+    def 'beenNodeId is at 36 chars long'() {
         expect:
             beenNodeId.length() == 36
     }
 
-    def 'global beenUUIDGenerator returns unique strings'() {
-        when:
-            def uuids = (1..1000).collect { beenUUIDGenerator.generate() } // I know, but at least some test :)
-
-        then:
-            uuids.unique() == uuids
+    def 'global beenUUIDGenerator is instantiated'() {
+        expect:
+            beenUUIDGenerator.generate() instanceof String
     }
 
     def 'beenWorkingDiretory has been created'() {
@@ -53,41 +48,25 @@ class ApplicationContextLiteNodeTest extends Specification {
 
     def 'hazelcastInstance is of type DATA'() {
         expect:
-            hazelcastInstance.cluster.getLocalMember().isLiteMember() == true
+            hazelcastInstance.cluster.getLocalMember().isLiteMember() == false
     }
 
     def 'nodeInfo is filled by at least some values'() {
         expect:
-            nodeInfo.nodeType == NodeType.LITE
+            nodeInfo.nodeType == NodeType.DATA
             nodeInfo.id == beenNodeId
             nodeInfo.operatingSystem != null
             nodeInfo.java != null
     }
 
     @DirtiesContext
-    def 'lite node cannot be started without any already running data node in the cluster'() {
-        when:
-            node.start()
-
-        then:
-            def ex = thrown(NodeException)
-            ex.message == "Cannot start LITE node as there is no no DATA node present in the cluster."
-    }
-
-    @DirtiesContext
-    def 'lite node can be started when there is at least single data node in the cluster'() {
-        given:
-            def dataNode = Hazelcast.newHazelcastInstance()
-
+    def 'node can be started and stopped'() {
         when:
             node.start()
             node.stop()
 
         then:
             noExceptionThrown()
-
-        cleanup:
-            dataNode.shutdown()
     }
 
 }
