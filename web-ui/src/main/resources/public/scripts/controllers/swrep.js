@@ -12,8 +12,12 @@ app.service('swRepService', function ($http) {
 });
 
 app.controller('SwRepCtrl', function ($scope, swRepService) {
-    $scope.bpks = null;
+    $scope.swreps = null;
     swRepService.list().then(function (data) {
-        $scope.bpks = data.data
+        $scope.swreps = data.data
     });
+});
+
+app.controller('SwRepDetailCtrl', function ($scope, swRepService, $stateParams) {
+    $scope.sr = $stateParams.id;
 });

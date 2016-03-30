@@ -16,6 +16,14 @@ public final class MapNames {
     public static final String NODE_ADDRESSES = "BEEN:NODE_ADDRESSES";
 
     /**
+     * MultiMap with this name stores services names running on nodes.
+     *
+     * key ({@link java.lang.String}) is UUID of Hazelcast node
+     * value ({@link java.lang.String}) are names of services running on the node
+     */
+    public static final String SERVICES = "BEEN:SERVICES";
+
+    /**
      * Map with this name stores information about nodes.
      *
      * key ({@link java.lang.String}) is UUID of Hazelcast node

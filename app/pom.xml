@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>cz.cuni.mff.d3s.been</groupId>
+            <artifactId>swr</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.cuni.mff.d3s.been</groupId>
             <artifactId>host-runtime</artifactId>
             <version>3.1.0</version>
         </dependency>

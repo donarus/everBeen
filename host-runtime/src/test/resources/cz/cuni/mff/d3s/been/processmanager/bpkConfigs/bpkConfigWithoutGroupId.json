@@ -1,8 +1,0 @@
-{
-  "type": "java",
-
-  "bpkId": "task-example-helloworld",
-  "version": "1.0.0-SNAPSHOT",
-
-  "jarFile": "task-example-helloworld-1.0.0-SNAPSHOT.jar"
-}

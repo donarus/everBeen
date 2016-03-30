@@ -22,7 +22,7 @@ app.service('nodeService', function ($http) {
     };
 });
 
-app.controller('NodesCtrl', function ($scope, nodeService, $interval) {
+app.controller('NodeCtrl', function ($scope, nodeService, $interval) {
     $scope.nodes = null;
     $scope.currentTime = new Date()
     nodeService.list().then(function (data) {

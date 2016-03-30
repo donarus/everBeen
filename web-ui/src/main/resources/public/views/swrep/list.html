@@ -1,6 +1,6 @@
 <div>
     <div class="row">
-        <div class="col-lg-12"><h1 class="page-header">Bpk packages</h1></div> <!-- /.col-lg-12 -->
+        <div class="col-lg-12"><h1 class="page-header">Software Repositories</h1></div> <!-- /.col-lg-12 -->
     </div> <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
@@ -8,34 +8,14 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>started</th>
-                        <th>uptime</th>
-                        <th>type</th>
-                        <th>OS (version)</th>
-                        <th>architecture</th>
-                        <th>vendor (version)</th>
-                        <th>java (version)</th>
-                        <th>ram</th>
-                        <th>swap</th>
-                        <th>cpu</th>
-                        <th>cores</th>
+                        <th>runs on node</th>
+                        <th>see details</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="bpk in bpks">
-                        <td><a ui-sref="admin.nodedetail({ id: node.id })">{{node.id | limitTo: 8}}</a></td>
-                        <td>{{node.startUpTime | dateFormat:'yy/MM/dd hh:mm:ss'}}</td>
-                        <td>{{node.startUpTime | timeDiffToString: currentTime}}</td>
-                        <td>{{node.nodeType}}</td>
-                        <td>{{node.operatingSystem.name}} ({{node.operatingSystem.version}})</td>
-                        <td>{{node.operatingSystem.arch}}</td>
-                        <td>{{node.operatingSystem.vendor}} ({{node.operatingSystem.vendorVersion}})</td>
-                        <td>{{node.java.vendor}} ({{node.java.version}})</td>
-                        <td>{{node.hardware.memory.ram | bytesToString}}</td>
-                        <td>{{node.hardware.memory.swap | bytesToString}}</td>
-                        <td>{{node.hardware.cpu[0].vendor}} - {{node.hardware.cpu[0].model}}</td>
-                        <td>{{node.hardware.cpu.length}}</td>
+                    <tr ng-repeat="sr in swreps">
+                        <td><a ui-sref="root.node.detail({ id:sr })">{{sr | limitTo: 8}}</a></td>
+                        <td><a ui-sref="root.swrep.detail({ id:sr })">detail</a></td>
                     </tr>
                     </tbody>
                 </table>

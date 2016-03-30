@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.been.webapi.swr;
 
 import com.google.gson.Gson;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.query.SqlPredicate;
+import cz.cuni.mff.d3s.been.commons.MapNames;
 import cz.cuni.mff.d3s.been.commons.bpk.BpkId;
 import cz.cuni.mff.d3s.been.hr.HostRuntimeAPI;
 import cz.cuni.mff.d3s.been.service.ACP;
@@ -14,6 +16,7 @@ import spark.Route;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SoftwareRepository implements Route {
 
@@ -60,26 +63,14 @@ public class SoftwareRepository implements Route {
 //            return get(request.queryParams("id"));
     }
 
-    private List<BpkId> list() {
-        // FIXME maybe dont list all distributed objects but store somewhere some information about where SWRep runs
-        ((HostRuntimeAPI)(hazelcastInstance.getDistributedObject("HostRuntimeAPI", "8ed0a00b-92af-4ac1-9f8b-0c416ce14e1b"))).getId();
-        List<SWRAPI> repositories = hazelcastInstance
-                .getDistributedObjects()
+    private List<String> list() {
+        return hazelcastInstance
+                .getMultiMap(MapNames.SERVICES)
+                .entrySet()
                 .stream()
-                .filter(d -> d.getServiceName().equals("SoftwareRepositoryAPI"))
-                .map(d -> (SWRAPI) d)
+                .filter(e -> e.getValue().equals("SoftwareRepositoryAPI"))
+                .map(e -> (String)e.getKey())
                 .collect(Collectors.toList());
-
-         List<BpkId> bpkIds = repositories.stream().map(r -> {
-             try {
-                 return r.list();
-             } catch (SWRException e) {
-                 e.printStackTrace();
-             }
-             return null;
-         }).filter(p -> p != null).flatMap(p -> p.stream()).collect(Collectors.toList());
-
-        return bpkIds;
     }
 
 }

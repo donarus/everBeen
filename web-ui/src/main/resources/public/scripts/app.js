@@ -78,7 +78,7 @@ beenApp.config(function (stateHelperProvider, $urlRouterProvider, $ocLazyLoadPro
                     }
                 },
                 children: [
-                    {name: 'list', url: '/list', controller: "NodesCtrl", templateUrl: "views/node/list.html"},
+                    {name: 'list', url: '/list', controller: "NodeCtrl", templateUrl: "views/node/list.html"},
                     {name: 'detail', url:'/detail/:id', controller: "NodeDetailCtrl", templateUrl: "views/node/detail.html"}
                 ]
             },
@@ -95,7 +95,8 @@ beenApp.config(function (stateHelperProvider, $urlRouterProvider, $ocLazyLoadPro
                     }
                 },
                 children: [
-                    {name: 'list', url: '/list', controller: "SwRepCtrl", templateUrl: "views/swrep/list.html"}
+                    {name: 'list', url: '/list', controller: "SwRepCtrl", templateUrl: "views/swrep/list.html"},
+                    {name: 'detail', url: '/detail/:id', controller: "SwRepDetailCtrl", templateUrl: "views/swrep/detail.html"}
                 ]
             }
         ]

@@ -8,6 +8,8 @@ import com.hazelcast.core.HazelcastInstance;
 import cz.cuni.mff.d3s.been.commons.exceptions.NodeException;
 import cz.cuni.mff.d3s.been.commons.nodeinfo.NodeType;
 import cz.cuni.mff.d3s.been.service.rpc.RemoteServiceDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -19,6 +21,8 @@ import java.util.List;
  * implementing interface {@link RemoteServiceDefinition}.
  */
 final class HazelcastInstanceFactoryBean extends AbstractFactoryBean<HazelcastInstance> {
+
+    private static final Logger log = LoggerFactory.getLogger(HazelcastInstanceFactoryBean.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -49,8 +53,10 @@ final class HazelcastInstanceFactoryBean extends AbstractFactoryBean<HazelcastIn
 
     private ServicesConfig createServiceConfig() {
         ServicesConfig config = new ServicesConfig();
-        if (serviceDefinitions != null) {
+        if (serviceDefinitions != null && !serviceDefinitions.isEmpty()) {
+            log.info("Registering remote services");
             for (RemoteServiceDefinition definition : serviceDefinitions) {
+                log.info("  registering [{}]", definition.getServiceName());
                 config.addServiceConfig(new ServiceConfig()
                         .setEnabled(true)
                         .setName(definition.getServiceName())
